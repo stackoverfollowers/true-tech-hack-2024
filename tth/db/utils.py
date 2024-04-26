@@ -2,7 +2,7 @@ import abc
 import os
 from argparse import Namespace
 from collections.abc import Callable, Coroutine
-from enum import StrEnum
+from enum import Enum
 from functools import wraps
 from pathlib import Path
 from typing import Any, Concatenate, ParamSpec, TypeVar
@@ -104,7 +104,7 @@ def make_alembic_config(cmd_opts: Namespace, base_path: Path = PROJECT_PATH) -> 
     return config
 
 
-def make_pg_enum(enum_cls: type[StrEnum], **kwargs: Any) -> pg.ENUM:
+def make_pg_enum(enum_cls: type[Enum], **kwargs: Any) -> pg.ENUM:
     return pg.ENUM(
         enum_cls,
         values_callable=_choices,
@@ -112,5 +112,5 @@ def make_pg_enum(enum_cls: type[StrEnum], **kwargs: Any) -> pg.ENUM:
     )
 
 
-def _choices(enum_cls: type[StrEnum]) -> tuple[str, ...]:
+def _choices(enum_cls: type[Enum]) -> tuple[str, ...]:
     return tuple(map(str, enum_cls))
