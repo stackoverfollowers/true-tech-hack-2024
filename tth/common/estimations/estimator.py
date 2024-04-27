@@ -8,11 +8,16 @@ from tth.common.events.storage import IEventStorage
 
 
 class Estimator:
-    _event_storage: IEventStorage
     _disability_storage: IDisabilityStorage
+    _event_storage: IEventStorage
 
-    def __init__(self, disability_storage: IDisabilityStorage) -> None:
+    def __init__(
+        self,
+        event_storage: IEventStorage,
+        disability_storage: IDisabilityStorage,
+    ) -> None:
         self._disability_storage = disability_storage
+        self._event_storage = event_storage
 
     async def estimate(self, user_id: int, event_id: int) -> Mapping[str, int]:
         event = await self._event_storage.get_by_id(event_id)
