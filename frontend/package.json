@@ -11,7 +11,7 @@
     "stylelint": "stylelint \"src/**/*.css\"",
     "stylelint:fix": "stylelint --fix \"src/**/*.css\"",
     "preview": "vite preview",
-    "prepare": "husky install"
+    "prepare": "cd .. && npx husky frontend/.husky"
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --cache --fix",
