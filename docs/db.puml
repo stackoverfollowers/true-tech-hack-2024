@@ -1,0 +1,68 @@
+@startuml database
+
+entity "User" as u {
+    * id: integer
+    * type: UserType
+    * username: string
+    * password_hash: string
+    * properties: JSONB
+    * created_at: DateTime
+    * updated_at: DateTime
+}
+
+entity "Place" as p {
+    * id: integer
+    * name: string
+    * description: string
+    * address: string
+    * created_at: DateTime
+    * updated_at: DateTime
+}
+
+entity "Event" as e {
+    * id: integer
+    * place_id: integer <<FK>>
+    * name: string
+    * description: string
+    * started_at: DateTime
+    * ended_at: DateTime
+    * created_at: DateTime
+    * updated_at: DateTime
+}
+
+enum "DisabilityStatus" as ds {
+    * ADVANTAGE: 1
+    * DISADVANTAGE: -1
+}
+
+entity "Disability" as d {
+    * id: integer
+    * name: string
+    * group: string
+    * status: DisabilityStatus
+}
+
+entity "PlaceDisability" as pd {
+    * place_id: integer <<FK>>
+    * disability_id: integer <<FK>>
+}
+
+entity "EventDisability" as ed {
+    * event_id: integer <<FK>>
+    * disability_id: integer <<FK>>
+}
+
+entity "UserDisability" as ud {
+    * user_id: integer <<FK>>
+    * disability_id: integer <<FK>>
+}
+
+p ||--|{ pd
+d ||--|{ pd
+p ||--|{ e
+u ||--|{ ud
+d ||--|{ ud
+ds ||--|{ d
+e ||--|{ ed
+d ||--|{ ed
+@enduml
