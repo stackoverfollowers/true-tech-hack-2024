@@ -4,7 +4,10 @@ import { AuthPage } from '../../pages/auth';
 import { ProfilePage } from '../../pages/profile';
 import { RootPage } from '../../pages/root';
 import { Layout } from '@widgets/layout';
+<<<<<<< HEAD
 import { EventPage } from '@pages/event';
+=======
+>>>>>>> fc088ce (adds frontend)
 
 export const router = createBrowserRouter([
   {
