@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 from datetime import datetime
-from enum import IntEnum, unique
+from enum import StrEnum, unique
 from typing import Any
 
 from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String
@@ -13,9 +13,9 @@ from tth.db.utils import make_pg_enum
 
 
 @unique
-class DisabilityStatus(IntEnum):
-    ADVATAGE = 1
-    DISADVANTAGE = -1
+class FeatureValue(StrEnum):
+    AVAILABLE = "AVAILABLE"
+    NOT_AVAILABLE = "NOT_AVAILABLE"
 
 
 class User(Base, TimestampMixin):
@@ -76,7 +76,10 @@ class Place(Base, TimestampMixin):
 class Event(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     place_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("place.id"), nullable=False, index=True
+        Integer,
+        ForeignKey("place.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
     description: Mapped[str] = mapped_column(String(256), nullable=False)
@@ -88,61 +91,51 @@ class Event(Base, TimestampMixin):
     )
 
 
-class Disability(Base):
+class Feature(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
-    group: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
-    status: Mapped[DisabilityStatus] = mapped_column(
-        make_pg_enum(DisabilityStatus, name="disability_status"),
+    slug: Mapped[str] = mapped_column(
+        String(256), nullable=False, unique=True, index=True
     )
 
 
-class PlaceDisability(Base):
+class PlaceFeature(Base):
     place_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("place.id"),
+        ForeignKey("place.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
         primary_key=True,
     )
-    disability_id: Mapped[int] = mapped_column(
+    feature_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("disability.id"),
+        ForeignKey("feature.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
         primary_key=True,
     )
+    value: Mapped[FeatureValue] = mapped_column(
+        make_pg_enum(FeatureValue, name="feature_value"),
+        nullable=False,
+    )
 
 
-class EventDisability(Base):
+class EventFeature(Base):
     event_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("event.id"),
+        ForeignKey("event.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
         primary_key=True,
     )
-    disability_id: Mapped[int] = mapped_column(
+    feature_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("disability.id"),
+        ForeignKey("feature.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
         primary_key=True,
     )
-
-
-class UserDisability(Base):
-    user_id: Mapped[int] = mapped_column(
-        Integer,
-        ForeignKey("user.id"),
+    value: Mapped[FeatureValue] = mapped_column(
+        make_pg_enum(FeatureValue, name="feature_value"),
         nullable=False,
-        index=True,
-        primary_key=True,
-    )
-    disability_id: Mapped[int] = mapped_column(
-        Integer,
-        ForeignKey("disability.id"),
-        nullable=False,
-        index=True,
-        primary_key=True,
     )

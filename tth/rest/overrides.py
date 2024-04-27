@@ -15,7 +15,7 @@ class GetUserDispatcher:
     pass
 
 
-class GetEstimator:
+class GetEventStorage:
     pass
 
 

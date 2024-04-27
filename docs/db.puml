@@ -30,39 +30,42 @@ entity "Event" as e {
     * updated_at: DateTime
 }
 
-enum "DisabilityStatus" as ds {
-    * ADVANTAGE: 1
-    * DISADVANTAGE: -1
+enum "FeatureValue" as fv {
+    * AVAILABLE: 1
+    * NOT_AVAILABLE: -1
 }
 
-entity "Disability" as d {
+entity "Feature" as f {
     * id: integer
+    * slug: string
     * name: string
-    * group: string
-    * status: DisabilityStatus
 }
 
-entity "PlaceDisability" as pd {
+entity "PlaceFeature" as pf {
     * place_id: integer <<FK>>
-    * disability_id: integer <<FK>>
+    * feature_id: integer <<FK>>
+    * feature_value: FeatureValue
 }
 
-entity "EventDisability" as ed {
+entity "EventFeature" as ef {
     * event_id: integer <<FK>>
-    * disability_id: integer <<FK>>
+    * feature_id: integer <<FK>>
+    * feature_value: FeatureValue
 }
 
-entity "UserDisability" as ud {
-    * user_id: integer <<FK>>
-    * disability_id: integer <<FK>>
+entity "SimilarPlace" as sp {
+   * place_id: integer <<FK>>
+   * similar_id: integer <<FK>>
 }
 
-p ||--|{ pd
-d ||--|{ pd
+
+p ||--|{ pf
+f ||--|{ pf
+fv ||--|{ pf
+fv ||--|{ ef
 p ||--|{ e
-u ||--|{ ud
-d ||--|{ ud
-ds ||--|{ d
-e ||--|{ ed
-d ||--|{ ed
+e ||--|{ ef
+f ||--|{ ef
+p ||--|{ sp
+p ||--|{ sp
 @enduml

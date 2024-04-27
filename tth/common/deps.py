@@ -4,13 +4,7 @@ from aiomisc_dependency import dependency
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from tth.args import Parser
-from tth.common.disabilities.storage import (
-    DisabilityCachedStorage,
-    DisabilityStorage,
-    IDisabilityStorage,
-)
-from tth.common.estimations.estimator import Estimator
-from tth.common.events.storage import IEventStorage
+from tth.common.events.storage import EventStorage, IEventStorage
 from tth.common.users.storage import UserStorage
 from tth.db.utils import (
     create_async_engine,
@@ -42,25 +36,7 @@ def config_deps(parser: Parser) -> None:
         return UserStorage(session_factory=session_factory)
 
     @dependency
-    def disability_storage(
-        session_factory: async_sessionmaker[AsyncSession],
-    ) -> IDisabilityStorage:
-        storage = DisabilityStorage(session_factory=session_factory)
-        if parser.with_cache:
-            return DisabilityCachedStorage(storage=storage)
-        return storage
-
-    @dependency
     def event_storage(
         session_factory: async_sessionmaker[AsyncSession],
     ) -> IEventStorage:
-        pass
-
-    @dependency
-    def estimator(
-        disability_storage: IDisabilityStorage,
-        event_storage: IEventStorage,
-    ) -> Estimator:
-        return Estimator(
-            disability_storage=disability_storage, event_storage=event_storage
-        )
+        return EventStorage(session_factory=session_factory)

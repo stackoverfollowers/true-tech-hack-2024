@@ -1,0 +1,4 @@
+stages:
+  - lint
+  - test
+  - build
