@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from starlette.middleware import Middleware
 
+from tth.common.estimations.estimator import Estimator
 from tth.common.exceptions import (
     HackTemplateException,
     UserWithUsernameAlreadyExistsException,
@@ -22,6 +23,7 @@ from tth.rest.overrides import (
     REQUIRE_ADMIN_AUTH,
     REQUIRE_AUTH,
     REQUIRE_REGULAR_AUTH,
+    GetEstimator,
     GetSessionFactory,
     GetUserDispatcher,
     GetUserStorage,
@@ -44,6 +46,7 @@ class REST(UvicornService):
         "user_storage",
         "security_manager",
         "user_dispatcher",
+        "estimator",
     )
 
     EXCEPTION_HANDLERS: ExceptionHandlersType = (
@@ -62,6 +65,7 @@ class REST(UvicornService):
     rest_middlewares: Sequence[Middleware]
     user_storage: UserStorage
     user_dispatcher: UserDispatcher
+    estimator: Estimator
 
     async def create_application(self) -> UvicornApplication:
         app = FastAPI(
@@ -100,5 +104,6 @@ class REST(UvicornService):
                 GetSessionFactory: lambda: self.session_factory,
                 GetUserStorage: lambda: self.user_storage,
                 GetUserDispatcher: lambda: self.user_dispatcher,
+                GetEstimator: lambda: self.estimator,
             }
         )
