@@ -13,6 +13,12 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from tth.args import Parser
 from tth.bot.middlewares.deps import DepsMiddleware
 from tth.bot.middlewares.user import UserMiddleware
+from tth.common.disabilities.storage import (
+    DisabilityCachedStorage,
+    DisabilityStorage,
+    IDisabilityStorage,
+)
+from tth.common.estimations.estimator import Estimator
 from tth.common.telegram.storage import TelegramStorage
 from tth.common.users.storage import UserStorage
 from tth.db.utils import (
@@ -88,10 +94,31 @@ def config_deps(parser: Parser) -> None:  # noqa: C901
 
     @dependency
     def user_dispatcher(
-        user_storage: UserStorage, auth_provider: IAuthProvider, passgen: Passgen
+        user_storage: UserStorage,
+        auth_provider: IAuthProvider,
+        passgen: Passgen,
     ) -> UserDispatcher:
         return UserDispatcher(
-            user_storage=user_storage, auth_provider=auth_provider, passgen=passgen
+            user_storage=user_storage,
+            auth_provider=auth_provider,
+            passgen=passgen,
+        )
+
+    @dependency
+    def disability_storage(
+        session_factory: async_sessionmaker[AsyncSession],
+    ) -> IDisabilityStorage:
+        storage = DisabilityStorage(session_factory=session_factory)
+        if parser.with_cache:
+            return DisabilityCachedStorage(storage=storage)
+        return storage
+
+    @dependency
+    def estimator(
+        disability_storage: IDisabilityStorage,
+    ) -> Estimator:
+        return Estimator(
+            disability_storage=disability_storage,
         )
 
     @dependency

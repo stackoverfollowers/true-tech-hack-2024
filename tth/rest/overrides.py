@@ -15,6 +15,10 @@ class GetUserDispatcher:
     pass
 
 
+class GetEstimator:
+    pass
+
+
 class MaybeAuth(APIKeyHeader):
     pass
 
