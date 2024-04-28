@@ -1,4 +1,21 @@
+image: python:3.11
+
+variables:
+  PIP_CACHE_DIR: $CI_PROJECT_DIR/.cache/pip
+
+cache:
+  paths:
+    - .cache/pip
+
+before_script:
+  - make develop
+
 stages:
   - lint
   - test
   - build
+
+lint:
+  stage: lint
+  script:
+    - make lint-ci
