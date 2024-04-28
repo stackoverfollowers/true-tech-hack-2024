@@ -40,8 +40,6 @@ const Wrapper = styled('div')(({ theme }) => ({
 export const RootPage = () => {
   const { data } = useGetEvents();
 
-  console.log('data', data)
-
   return (
     <>
       <StyledContainer>

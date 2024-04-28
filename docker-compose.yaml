@@ -72,9 +72,14 @@ services:
 
       APP_LOG_LEVEL: info
       APP_LOG_FORMAT: json
+<<<<<<< HEAD
 
       APP_AMQP_DSN: amqp://$RABBITMQ_USER:$RABBITMQ_PASSWORD@rabbitmq:5672/
 
+=======
+    ports:
+      - 8000:8000
+>>>>>>> edc1346 (change data according to backend entity)
     depends_on:
       db:
         condition: service_healthy
