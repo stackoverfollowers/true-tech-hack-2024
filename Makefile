@@ -25,7 +25,9 @@ test: ##@Test Run tests with pytest
 	pytest -vvx $(TEST_PATH)
 
 test-ci: ##@Test Run tests with pytest and coverage in CI
-	.venv/bin/pytest $(TEST_PATH) --junitxml=./junit.xml --cov=./$(PROJECT_NAME) --cov-report=xml
+	.venv/bin/coverage run -m pytest $(TEST_PATH) --junitxml=junit_report.xml
+	.venv/bin/coverage report
+	.venv/bin/coverage xml
 
 develop: clean_dev ##@Develop Create virtualenv
 	python$(PYTHON_VERSION) -m venv .venv

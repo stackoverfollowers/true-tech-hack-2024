@@ -2,12 +2,12 @@ import abc
 import asyncio
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime
 
 from sqlalchemy import delete, func, insert, select, union, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from tth.common.events.models import (
+    CreateEventModel,
     EventFeatureModel,
     EventModel,
     EventPaginationModel,
@@ -35,11 +35,7 @@ class IEventStorage(abc.ABC):
     @abc.abstractmethod
     async def create(
         self,
-        place_id: int,
-        name: str,
-        description: str,
-        started_at: datetime,
-        ended_at: datetime,
+        new_event: CreateEventModel,
     ) -> EventModel:
         raise NotImplementedError
 
@@ -119,24 +115,20 @@ class EventStorage(IEventStorage):
     async def create(
         self,
         session: AsyncSession,
-        place_id: int,
-        name: str,
-        description: str,
-        started_at: datetime,
-        ended_at: datetime,
+        new_event: CreateEventModel,
     ) -> EventModel:
         stmt = (
             insert(EventDb)
             .values(
-                place_id=place_id,
-                name=name,
-                description=description,
-                started_at=started_at,
-                ended_at=ended_at,
+                place_id=new_event.place_id,
+                name=new_event.name,
+                description=new_event.description,
+                started_at=new_event.started_at,
+                ended_at=new_event.ended_at,
             )
             .returning(EventDb)
         )
-        result = await session.execute(stmt)
+        result = await session.scalars(stmt)
         await session.commit()
         return EventModel.model_validate(result.one())
 
@@ -154,13 +146,14 @@ class EventStorage(IEventStorage):
             .values(**data)
             .returning(EventDb)
         )
-        result = await session.execute(stmt)
+        result = await session.scalars(stmt)
         await session.commit()
         return EventModel.model_validate(result.one())
 
     @inject_session
     async def delete(self, session: AsyncSession, event_id: int) -> None:
         await session.execute(delete(EventDb).where(EventDb.id == event_id))
+        await session.commit()
 
     async def pagination(
         self,

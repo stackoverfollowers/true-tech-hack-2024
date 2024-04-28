@@ -26,7 +26,6 @@ def main() -> None:
             description=parser.project.description,
             version=parser.project.version,
         ),
-        # TelegramBotService(),
     ]
 
     with entrypoint(

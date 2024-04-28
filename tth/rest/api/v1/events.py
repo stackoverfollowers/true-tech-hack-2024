@@ -12,7 +12,7 @@ from tth.common.events.models import (
 from tth.common.events.storage import IEventStorage
 from tth.rest.overrides import GetEventStorage
 
-router = APIRouter(prefix="/events")
+router = APIRouter(prefix="/events", tags=["Events"])
 
 
 @router.get("", response_model=EventPaginationModel)
@@ -30,20 +30,20 @@ async def create_event(
     event_storage: IEventStorage = Depends(GetEventStorage),
 ) -> EventModel:
     return await event_storage.create(
-        place_id=new_event.place_id,
-        name=new_event.name,
-        description=new_event.description,
-        started_at=new_event.started_at,
-        ended_at=new_event.ended_at,
+        new_event=new_event,
     )
 
 
-@router.get("/{event_id}", response_model=EventWithFeaturesModel)
+@router.get(
+    "/{event_id}",
+    response_model=EventWithFeaturesModel,
+    summary="Get Event with features",
+)
 async def get_event(
     event_id: int,
     event_storage: IEventStorage = Depends(GetEventStorage),
 ) -> EventWithFeaturesModel:
-    event = await event_storage.get_by_id_with_features(event_id)
+    event = await event_storage.get_by_id_with_features(event_id=event_id)
     if event is None:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
@@ -52,13 +52,16 @@ async def get_event(
     return event
 
 
-@router.put("/{event_id}")
+@router.post("/{event_id}")
 async def update_event(
     event_id: int,
     update_event: UpdateEventModel,
     event_storage: IEventStorage = Depends(GetEventStorage),
 ) -> EventModel:
-    return await event_storage.update(event_id=event_id, update_event=update_event)
+    return await event_storage.update(
+        event_id=event_id,
+        update_event=update_event,
+    )
 
 
 @router.delete("/{event_id}", status_code=204)
