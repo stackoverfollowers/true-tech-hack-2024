@@ -57,7 +57,7 @@ command_line = "-m pytest"
 show_missing = true
 
 [tool.coverage.xml]
-output = "coverage.xml"
+output = "coverage_report.xml"
 
 [tool.ruff]
 line-length = 88

@@ -8,6 +8,7 @@ from fastapi.middleware import Middleware
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from yarl import URL
 
+from tth.common.events.storage import EventStorage
 from tth.common.users.storage import UserStorage
 from tth.rest.auth.base import SecurityManager
 from tth.rest.middlewares import get_cors_middleware
@@ -33,6 +34,7 @@ def rest_url(localhost: str, aiomisc_unused_port_factory) -> URL:
 def rest_service(
     session_factory: async_sessionmaker[AsyncSession],
     user_storage: UserStorage,
+    event_storage: EventStorage,
     security_manager: SecurityManager,
     user_dispatcher: UserDispatcher,
     rest_middlewares: Sequence[Middleware],
@@ -47,6 +49,7 @@ def rest_service(
         version="test-1.0.0",
         session_factory=session_factory,
         rest_middlewares=rest_middlewares,
+        event_storage=event_storage,
         user_storage=user_storage,
         security_manager=security_manager,
         user_dispatcher=user_dispatcher,

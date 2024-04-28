@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 import factory
 import pytest
 from sqlalchemy import select
@@ -22,6 +24,8 @@ class UserFactory(factory.Factory):
     username = factory.Sequence(lambda n: f"username-{n+1}")
     password_hash = "secret"
     properties = factory.SubFactory(UserPropertiesFactory)
+    created_at = factory.LazyFunction(lambda: datetime.now(tz=UTC))
+    updated_at = factory.LazyFunction(lambda: datetime.now(tz=UTC))
 
 
 @pytest.fixture
