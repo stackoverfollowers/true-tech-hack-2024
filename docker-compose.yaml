@@ -40,7 +40,8 @@ services:
 
       APP_LOG_LEVEL: info
       APP_LOG_FORMAT: json
-
+    ports:
+      - 8000:8000
     depends_on:
       db:
         condition: service_healthy

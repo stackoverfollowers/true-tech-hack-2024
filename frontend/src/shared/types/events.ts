@@ -6,4 +6,11 @@ type Event = {
   accessibility: string;
 };
 
-export type { Event };
+type EventsResponse = {
+  id: number;
+  place_id: number;
+  name: string;
+  description: string;
+};
+
+export type { Event, EventsResponse };
