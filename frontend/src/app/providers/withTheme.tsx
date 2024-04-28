@@ -1,6 +1,6 @@
+import CssBaseline from '@mui/material/CssBaseline';
 import { createContext, useMemo, useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 
 export const ThemeContext = createContext({ toggle: () => {} });
 

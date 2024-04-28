@@ -1,18 +1,15 @@
-import { Box } from '@mui/material';
 import { Header } from '@widgets/header';
 import { Outlet } from 'react-router-dom';
 
+import styles from './styles.module.css';
+
 export const Layout = () => {
   return (
-    <>
+    <div className={styles.layout}>
       <Header />
-      <Box
-        sx={{
-          width: '100%',
-        }}
-      >
+      <main className={styles.container}>
         <Outlet />
-      </Box>
-    </>
+      </main>
+    </div>
   );
 };
