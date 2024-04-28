@@ -1,3 +1,4 @@
+import { useGetEvents } from '@entities/event/api';
 import { Container, Typography, styled } from '@mui/material';
 import { LiveEvent } from '@widgets/live-event';
 
@@ -37,6 +38,8 @@ const Wrapper = styled('div')(({ theme }) => ({
 }));
 
 export const RootPage = () => {
+  const { data } = useGetEvents();
+
   return (
     <>
       <StyledContainer>
@@ -44,19 +47,9 @@ export const RootPage = () => {
       </StyledContainer>
       <StyledContainer>
         <Cards>
-          {[...Array(30)].map((_, idx) => (
+          {data?.items.map((item, idx) => (
             <Wrapper key={idx}>
-              <LiveEvent
-                id={idx}
-                img="https://live.mts.ru/image/536x360/affinazh-russkie-pesni-s-orkestrom-narodnykh-instrumentov-09321d6d-b516-086e-12c3-1c87ef582f53.jpg"
-                title="Концерт «Mary Gu. Club Show»"
-                time="12 мая, 18:00"
-                place="Гигант-Холл"
-                price="1000р"
-                discount="10%"
-                accessibilityType="Bad"
-                accessibility="Недоступно для инвалидов"
-              />
+              <LiveEvent {...item} />
             </Wrapper>
           ))}
         </Cards>
