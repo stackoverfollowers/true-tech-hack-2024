@@ -25,6 +25,7 @@
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
     "@tanstack/react-query": "^5.29.0",
+    "axios": "^1.6.8",
     "clsx": "^2.1.0",
     "effector": "^23.2.0",
     "effector-react": "^23.2.0",
