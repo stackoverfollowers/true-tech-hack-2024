@@ -5,7 +5,6 @@ from tth.common.args import (
     HostPortGroup,
     LogGroup,
     ProjectGroup,
-    RedisGroup,
     SecurityGroup,
 )
 
@@ -32,4 +31,3 @@ class Parser(argclass.Parser):
     project = ProjectGroup(title="Project options")
     db = DatabaseGroup(title="Database options")
     security = SecurityGroup(title="Security options")
-    redis = RedisGroup(title="Redis options")

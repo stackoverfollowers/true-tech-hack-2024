@@ -12,7 +12,7 @@ from tth.rest.overrides import GetSessionFactory
 
 log = logging.getLogger(__name__)
 
-router = APIRouter(tags=["monitoring"], prefix="/monitoring")
+router = APIRouter(tags=["Monitoring"], prefix="/monitoring")
 
 TSessionFactory = async_sessionmaker[AsyncSession]
 

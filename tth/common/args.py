@@ -51,7 +51,3 @@ class ProjectGroup(argclass.Group):
 
 class DatabaseGroup(argclass.Group):
     pg_dsn: URL = argclass.Argument("--pg-dsn", required=True, type=URL)
-
-
-class RedisGroup(argclass.Group):
-    redis_dsn: URL = argclass.Argument("--redis-dsn", required=True, type=URL)
