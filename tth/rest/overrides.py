@@ -15,6 +15,10 @@ class GetUserDispatcher:
     pass
 
 
+class GetEventStorage:
+    pass
+
+
 class MaybeAuth(APIKeyHeader):
     pass
 

@@ -4,8 +4,7 @@ from aiomisc import Service, entrypoint
 from aiomisc_log import basic_config
 
 from tth.args import Parser
-from tth.bot.service import TelegramBotService
-from tth.deps import config_deps
+from tth.deps import config_all_deps
 from tth.rest.service import REST
 
 log = logging.getLogger(__name__)
@@ -15,7 +14,7 @@ def main() -> None:
     parser = Parser(auto_env_var_prefix="APP_")
     parser.parse_args([])
     parser.sanitize_env()
-    config_deps(parser)
+    config_all_deps(parser)
     basic_config(level=parser.log.level, log_format=parser.log.format)
 
     services: list[Service] = [
@@ -27,7 +26,7 @@ def main() -> None:
             description=parser.project.description,
             version=parser.project.version,
         ),
-        TelegramBotService(),
+        # TelegramBotService(),
     ]
 
     with entrypoint(

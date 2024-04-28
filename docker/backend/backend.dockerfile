@@ -24,8 +24,8 @@ RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
 
 USER appuser
 
-COPY ./hack_template ./hack_template
+COPY ./tth ./tth
 
 EXPOSE 8000
 
-CMD ["python", "-m", "hack_template"]
+CMD ["python", "-m", "tth"]
