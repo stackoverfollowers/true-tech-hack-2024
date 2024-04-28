@@ -22,7 +22,7 @@ from tth.rest.overrides import (
 )
 from tth.rest.users.dispatcher import UserDispatcher
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.get(

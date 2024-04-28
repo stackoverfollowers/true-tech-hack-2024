@@ -146,33 +146,6 @@ def upgrade() -> None:
         unique=False,
     )
     op.create_table(
-        "telegram",
-        sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("user_id", sa.Integer(), nullable=False),
-        sa.Column("chat_id", sa.BigInteger(), nullable=False),
-        sa.Column("is_banned", sa.Boolean(), nullable=False),
-        sa.Column(
-            "created_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.text("TIMEZONE('utc', now())"),
-            nullable=False,
-        ),
-        sa.Column(
-            "updated_at",
-            sa.DateTime(timezone=True),
-            server_default=sa.text("TIMEZONE('utc', now())"),
-            nullable=False,
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"], ["user.id"], name=op.f("fk__telegram__user_id__user")
-        ),
-        sa.PrimaryKeyConstraint("id", name=op.f("pk__telegram")),
-    )
-    op.create_index(
-        op.f("ix__telegram__chat_id"), "telegram", ["chat_id"], unique=False
-    )
-    op.create_index(op.f("ix__telegram__user_id"), "telegram", ["user_id"], unique=True)
-    op.create_table(
         "user_disability",
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("disability_id", sa.Integer(), nullable=False),
@@ -245,9 +218,6 @@ def downgrade() -> None:
         op.f("ix__user_disability__disability_id"), table_name="user_disability"
     )
     op.drop_table("user_disability")
-    op.drop_index(op.f("ix__telegram__user_id"), table_name="telegram")
-    op.drop_index(op.f("ix__telegram__chat_id"), table_name="telegram")
-    op.drop_table("telegram")
     op.drop_index(op.f("ix__place_disability__place_id"), table_name="place_disability")
     op.drop_index(
         op.f("ix__place_disability__disability_id"), table_name="place_disability"

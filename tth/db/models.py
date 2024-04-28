@@ -3,9 +3,9 @@ from datetime import datetime
 from enum import StrEnum, unique
 from typing import Any
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from tth.common.users.base import UserType
 from tth.db.base import Base, TimestampMixin
@@ -41,23 +41,6 @@ class User(Base, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, username={self.username!r})"
-
-
-class Telegram(Base, TimestampMixin):
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False, index=True, unique=True
-    )
-    chat_id: Mapped[int] = mapped_column(BigInteger, nullable=False, index=True)
-    is_banned: Mapped[bool] = mapped_column(nullable=False, default=False)
-
-    user: Mapped[User] = relationship("User", backref="telegram", uselist=False)
-
-    def __repr__(self) -> str:
-        return (
-            f"Telegram(id={self.id!r}, user_id={self.user_id!r}, "
-            f"chat_id={self.chat_id!r}, is_banned={self.is_banned!r})"
-        )
 
 
 class Place(Base, TimestampMixin):
