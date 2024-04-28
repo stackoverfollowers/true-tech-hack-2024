@@ -4,6 +4,7 @@ import { AuthPage } from '../../pages/auth';
 import { ProfilePage } from '../../pages/profile';
 import { RootPage } from '../../pages/root';
 import { Layout } from '@widgets/layout';
+import { EventPage } from '@pages/event';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
       {
         path: '/settings',
         element: <SettingsPage />,
+      },
+      {
+        path: '/events/:id',
+        element: <EventPage />,
       },
     ],
   },
