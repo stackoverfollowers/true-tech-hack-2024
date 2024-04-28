@@ -30,11 +30,7 @@ async def create_event(
     event_storage: IEventStorage = Depends(GetEventStorage),
 ) -> EventModel:
     return await event_storage.create(
-        place_id=new_event.place_id,
-        name=new_event.name,
-        description=new_event.description,
-        started_at=new_event.started_at,
-        ended_at=new_event.ended_at,
+        new_event=new_event,
     )
 
 

@@ -4,129 +4,11 @@
 
 ## Architecture
 
-```plantuml
-@startuml architecture
-
-actor User as user
-
-database Database <<PostgreSQL>> as db
-
-component Backend <<FastAPI Service>> as back
-
-component Frontend <<Nginx + React>> as front
-
-control Timer <<Cron>> as cron
-
-component "Place Parser" <<Aiomisc Service>> as p_parser
-
-component "Feature Parser" <<Aiomisc Service>> as f_parser
-
-cloud API <<MTS Live>> as mts
-
-cloud API <<Yandex Map>> as yandex
-
-queue "New Places" <<Queue>> as queue
-
-user -> front
-
-front --> back
-
-back --> db
-
-cron --> p_parser
-
-p_parser --> mts
-mts --> p_parser
-
-p_parser --> db
-p_parser --> queue
-
-f_parser <-- queue
-f_parser --> db
-
-back --> queue
-
-f_parser --> yandex
-yandex --> f_parser
-
-@enduml
-```
+![arch](https://www.plantuml.com/plantuml/svg/XP5DRi8m48NtFiM8RPKR80HjXLG9K2XqqLKriISeQcAd_g7qzXtRM91DkqZiUU-Rv8szT1wj3qClK7fZuSsH1NGGU1L2eSS67S5psSpdjN7-PEcmtomMaLID4D8Cez6aFJoY_2Ijc5kZywlw1Gvapvsa33Tit-DhQxJF_ExKwGiym2jnaaotqOsuzjRqSEm6iam-iPm1oRlxpytg7YL1ZPRZpnXTTMRed9o663_614mwruG-s7zxsrjlRu82df3HxV40c-vyPGRlflOxQaKNsEAOWPzK2_4LA13CTlGDARYBlzr7CNF95oBU1LIBSXnfWOg5V9hndSfq4socuZPasKKvPUFdBqGraxgaQ8ishwghraxRIfHfJm7Ar7b9Ih75ahGAG_yB)
 
 ## Database Schema
 
-```plantuml
-@startuml database
-
-entity "User" as u {
-    * id: integer
-    * type: UserType
-    * username: string
-    * password_hash: string
-    * properties: JSONB
-    * created_at: DateTime
-    * updated_at: DateTime
-}
-
-entity "Place" as p {
-    * id: integer
-    * name: string
-    * description: string
-    * address: string
-    * created_at: DateTime
-    * updated_at: DateTime
-}
-
-entity "Event" as e {
-    * id: integer
-    * place_id: integer <<FK>>
-    * name: string
-    * description: string
-    * started_at: DateTime
-    * ended_at: DateTime
-    * created_at: DateTime
-    * updated_at: DateTime
-}
-
-enum "FeatureValue" as fv {
-    * AVAILABLE: 1
-    * NOT_AVAILABLE: -1
-}
-
-entity "Feature" as f {
-    * id: integer
-    * slug: string
-    * name: string
-}
-
-entity "PlaceFeature" as pf {
-    * place_id: integer <<FK>>
-    * feature_id: integer <<FK>>
-    * feature_value: FeatureValue
-}
-
-entity "EventFeature" as ef {
-    * event_id: integer <<FK>>
-    * feature_id: integer <<FK>>
-    * feature_value: FeatureValue
-}
-
-entity "SimilarPlace" as sp {
-   * place_id: integer <<FK>>
-   * similar_id: integer <<FK>>
-}
-
-
-p ||--|{ pf
-f ||--|{ pf
-fv ||--|{ pf
-fv ||--|{ ef
-p ||--|{ e
-e ||--|{ ef
-f ||--|{ ef
-p ||--|{ sp
-p ||--|{ sp
-@enduml
-```
+![database](https://www.plantuml.com/plantuml/svg/jLFHQi8m57tlLrny7FZWQn5HcS8sqO7ErvAPMmsqCUGc7QBxzwKQR5PBXSdwT7DExkqv9ycG3DF6vXbmPjWd8umYb4QO0tG-27K76865OmJkUmB1On3Iu1QrHyn1OGpbrfMhF6ZTKhBS4MIqa5iFAqRqjTSysJ7QrJczLwYDG8hXTRcOZps-qSWCyeIP69vTjHBvzI-AtrBVbVxtZ6tmR42r66ZGoP4sMYWZzhB6CCur4bNeenedXQlE6h55eogT904E_VxqRJ3uYuNpWJUBHSdhn0C6RGwTgUkp6jSiivUJI8khpT5wz38RZMUJ67eUcYzMIG1tUq5KVfOVqn8MPNORUgu7LByXuLpb1z_FFBrqtTzGbDvZ29EukG2X1AmaOCdzluIbo4N6TFLSoB-NzX1SqfV69jwDZnISJjtkwUXIZTAmBXeNc5OT6640fqrRIFsgXoYvpRCV)
 
 ## Stack
 
@@ -142,7 +24,6 @@ p ||--|{ sp
 - ...
 
 ## Deployment
-
 
 ## Expluatation
 
