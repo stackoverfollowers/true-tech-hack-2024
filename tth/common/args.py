@@ -55,7 +55,3 @@ class DatabaseGroup(argclass.Group):
 
 class RedisGroup(argclass.Group):
     redis_dsn: URL = argclass.Argument("--redis-dsn", required=True, type=URL)
-
-
-class TelegramGroup(argclass.Group):
-    bot_token: str = argclass.Secret("--bot-token", required=True, type=str)
