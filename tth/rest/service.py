@@ -2,6 +2,7 @@ from collections.abc import Callable, Sequence
 
 from aiomisc.service.uvicorn import UvicornApplication, UvicornService
 from fastapi import FastAPI, HTTPException
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from starlette.middleware import Middleware
 
@@ -14,6 +15,7 @@ from tth.common.users.storage import UserStorage
 from tth.rest.api.router import router as api_router
 from tth.rest.auth.base import SecurityManager
 from tth.rest.exception_handlers import (
+    db_api_error_handler,
     http_exception_handler,
     internal_server_error_handler,
     user_already_exists_handler,
@@ -53,6 +55,7 @@ class REST(UvicornService):
         (HTTPException, http_exception_handler),
         (UserWithUsernameAlreadyExistsException, user_already_exists_handler),
         (HackTemplateException, internal_server_error_handler),
+        (DBAPIError, db_api_error_handler),
     )
 
     debug: bool

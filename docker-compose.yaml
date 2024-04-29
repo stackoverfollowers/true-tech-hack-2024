@@ -17,10 +17,6 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-
   backend:
     build:
       context: .
