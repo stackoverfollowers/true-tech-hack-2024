@@ -4,7 +4,7 @@ import { Pagination } from '@shared/types/pagination';
 import { useQuery } from '@tanstack/react-query';
 
 const queryKey = ['events'];
-const endpointKey = 'events';
+const endpointKey = '/events';
 
 const getEvents = async ({ signal }: { signal: AbortSignal }) => {
   const { data } = await axios(endpointKey, {
