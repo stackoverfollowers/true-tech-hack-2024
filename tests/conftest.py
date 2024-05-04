@@ -5,6 +5,7 @@ pytest_plugins = (
     "tests.plugins.factories.users",
     "tests.plugins.instances.auth",
     "tests.plugins.instances.events",
+    "tests.plugins.instances.places",
     "tests.plugins.instances.rest",
     "tests.plugins.instances.users",
 )

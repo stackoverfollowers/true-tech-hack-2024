@@ -2,8 +2,10 @@ from datetime import UTC, datetime
 
 import factory
 import pytest
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from tth.common.places.models import PlaceModel
 from tth.db.models import Place
 
 
@@ -28,3 +30,17 @@ def create_place(session: AsyncSession):
         return place
 
     return _create
+
+
+@pytest.fixture
+def read_place(session: AsyncSession):
+    async def _read_place(place_id: int) -> PlaceModel | None:
+        stmt = select(Place).where(Place.id == place_id)
+        obj = (await session.scalars(stmt)).first()
+        if obj is None:
+            return None
+        await session.refresh(obj)
+        return PlaceModel.model_validate(obj)
+
+    return _read_place
+

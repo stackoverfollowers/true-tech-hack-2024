@@ -66,6 +66,7 @@ exclude = [
     ".mypy_cache",
     ".ruff_cache",
     ".venv",
+    "tth/db/migrations"
 ]
 indent-width = 4
 target-version = "py311"
