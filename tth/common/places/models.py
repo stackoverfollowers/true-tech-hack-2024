@@ -2,8 +2,9 @@ from collections.abc import Sequence
 from datetime import datetime
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
+from tth.common.constants import MTS_DOMAIN
 from tth.common.models.pagination import MetaPaginationModel
 from tth.db.models import FeatureValue
 
@@ -13,7 +14,9 @@ class PlaceModel(BaseModel):
 
     id: int
     name: str
-    description: str
+    url: str
+    image_url: str
+    description: str | None
     address: str
     created_at: datetime
     updated_at: datetime
@@ -21,6 +24,8 @@ class PlaceModel(BaseModel):
 
 class CreatePlaceModel(BaseModel):
     name: str
+    url: str
+    image_url: str
     description: str
     address: str
 
@@ -38,6 +43,8 @@ class PlaceWithFeaturesModel(BaseModel):
 
     id: int
     name: str
+    url: str
+    image_url: str
     description: str
     address: str
     created_at: datetime
@@ -68,3 +75,31 @@ class UpdatePlaceModel(BaseModel):
     name: str | None = None
     description: str | None = None
     address: str | None = None
+    url: str | None = None
+    image_url: str | None = None
+
+
+class PlaceFromMtsModel(BaseModel):
+    id: int
+    title: str
+    address: str
+    url: str
+    image_url: str = Field(alias="imageUrl")
+
+    def model_post_init(self, __context: Any) -> None:
+        if not self.url.startswith(MTS_DOMAIN):
+            self.url = MTS_DOMAIN + self.url
+
+        if not self.image_url.startswith(MTS_DOMAIN):
+            self.image_url = MTS_DOMAIN + self.image_url
+
+
+class PlaceInEventFromMtsModel(BaseModel):
+    id: int
+    title: str
+    url: str
+
+
+class RegionPlacesMtsModel(BaseModel):
+    total: int
+    items: Sequence[PlaceFromMtsModel]

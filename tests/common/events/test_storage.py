@@ -10,6 +10,7 @@ from tth.common.events.models import (
     UpdateEventModel,
 )
 from tth.common.events.storage import IEventStorage
+from tth.db.models import EventType
 
 
 async def test_create_event__ok(
@@ -22,6 +23,9 @@ async def test_create_event__ok(
         new_event=CreateEventModel(
             place_id=place.id,
             name="Test Event",
+            event_type=EventType.CONCERTS,
+            url="Test URL",
+            image_url="Test Image URL",
             description="Very test event",
             started_at=datetime.now(),
             ended_at=datetime.now(),
@@ -59,6 +63,9 @@ async def test_get_event_by_id_with_features_not_features__ok(
         id=event.id,
         place_id=event.place_id,
         name=event.name,
+        url=event.url,
+        image_url=event.image_url,
+        event_type=event.event_type,
         description=event.description,
         started_at=event.started_at,
         ended_at=event.ended_at,

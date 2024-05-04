@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tth.common.events.models import EventModel
-from tth.db.models import Event
+from tth.db.models import Event, EventType
 
 
 class EventFactory(factory.Factory):
@@ -17,6 +17,9 @@ class EventFactory(factory.Factory):
     place_id = 1
     name = factory.Sequence(lambda n: f"event-{n+1}")
     description = "Description event"
+    event_type = EventType.CONCERTS
+    url = "Some URL"
+    image_url = "Some Image URL"
     started_at = datetime(year=2024, month=1, day=1, tzinfo=UTC)
     ended_at = datetime(year=2024, month=1, day=2, tzinfo=UTC)
     created_at = factory.LazyFunction(lambda: datetime.now(tz=UTC))

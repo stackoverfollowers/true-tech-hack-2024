@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 
+from tests.plugins.factories.places import PlaceMtsFactory
 from tth.common.events.models import (
     CreateEventModel,
     EventModel,
@@ -11,7 +12,7 @@ from tth.common.events.models import (
 )
 from tth.common.events.storage import IEventStorage
 from tth.common.places.models import CreatePlaceModel, PlaceModel, PlaceWithFeaturesModel, UpdatePlaceModel, \
-    PlacePaginationModel
+    PlacePaginationModel, PlaceFromMtsModel
 from tth.common.places.storage import IPlaceStorage
 
 
@@ -24,6 +25,8 @@ async def test_create_place__ok(
             name="Test Place",
             description="Test place description",
             address="Test Address",
+            url="Test URL",
+            image_url="Test Image URL",
         )
     )
 
@@ -58,6 +61,8 @@ async def test_get_place_by_id_with_features_not_features__ok(
         name=place.name,
         description=place.description,
         address=place.address,
+        url=place.url,
+        image_url=place.image_url,
         created_at=place.created_at,
         updated_at=place.updated_at,
         features=[],
@@ -140,3 +145,61 @@ async def test_pagination_offset__ok(
     [await create_place() for _ in range(4)]
     pagination = await place_storage.pagination(limit=10, offset=offset)
     assert len(pagination.items) == result
+
+
+async def test_save_many_from_mts__save_one(
+    place_storage: IPlaceStorage,
+):
+    place_from_mts = PlaceMtsFactory()
+    await place_storage.save_many_from_mts([place_from_mts])
+
+    saved_place = await place_storage.get_by_id(place_id=place_from_mts.id)
+
+    assert saved_place.id == place_from_mts.id
+    assert saved_place.name == place_from_mts.title
+    assert saved_place.url == place_from_mts.url
+    assert saved_place.image_url == place_from_mts.image_url
+    assert saved_place.address == place_from_mts.address
+
+
+async def test_save_many_from_mts__ok(
+    place_storage: IPlaceStorage,
+):
+    places_from_mts = [PlaceMtsFactory() for _ in range(3)]
+    places_ids = [p.id for p in places_from_mts]
+
+    saved_places_ids = await place_storage.save_many_from_mts(
+        places_from_mts
+    )
+
+    assert set(saved_places_ids) == set(places_ids)
+
+    for place_to_save in places_from_mts:
+        place_in_db = await place_storage.get_by_id(place_id=place_to_save.id)
+
+        assert place_in_db.url == place_to_save.url
+        assert place_in_db.image_url == place_to_save.image_url
+        assert place_in_db.name == place_to_save.title
+        assert place_in_db.address == place_to_save.address
+
+
+async def test_save_many_from_mts__with_conflict(
+    place_storage,
+    create_place,
+):
+    existing_place = await create_place()
+    place_from_mts = PlaceMtsFactory(id=existing_place.id)
+
+    updated_place_ids = await place_storage.save_many_from_mts(
+        [place_from_mts]
+    )
+
+    updated_place = await place_storage.get_by_id(
+        place_id=updated_place_ids[0])
+
+    assert updated_place.id == place_from_mts.id
+    assert updated_place.url == place_from_mts.url
+    assert updated_place.image_url == place_from_mts.image_url
+    assert updated_place.name == place_from_mts.title
+    assert updated_place.address == place_from_mts.address
+    assert updated_place.description == existing_place.description

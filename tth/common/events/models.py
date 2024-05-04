@@ -5,7 +5,7 @@ from typing import Any, Self
 from pydantic import BaseModel, ConfigDict
 
 from tth.common.models.pagination import MetaPaginationModel
-from tth.db.models import FeatureValue
+from tth.db.models import EventType, FeatureValue
 
 
 class EventModel(BaseModel):
@@ -14,6 +14,9 @@ class EventModel(BaseModel):
     id: int
     place_id: int
     name: str
+    event_type: EventType
+    url: str
+    image_url: str
     description: str
     started_at: datetime
     ended_at: datetime
@@ -24,6 +27,9 @@ class EventModel(BaseModel):
 class CreateEventModel(BaseModel):
     place_id: int
     name: str
+    event_type: EventType
+    url: str
+    image_url: str
     description: str
     started_at: datetime
     ended_at: datetime
@@ -43,6 +49,9 @@ class EventWithFeaturesModel(BaseModel):
     id: int
     place_id: int
     name: str
+    event_type: EventType
+    url: str
+    image_url: str
     description: str
     started_at: datetime
     ended_at: datetime
@@ -73,5 +82,8 @@ class EventPaginationModel(BaseModel):
 class UpdateEventModel(BaseModel):
     name: str | None = None
     description: str | None = None
+    event_type: EventType | None = None
+    url: str | None = None
+    image_url: str | None = None
     started_at: datetime | None = None
     ended_at: datetime | None = None
