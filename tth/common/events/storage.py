@@ -1,14 +1,19 @@
 import abc
 import asyncio
-from collections.abc import Sequence
+import logging
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
+from itertools import islice
+from typing import Any
 
-from sqlalchemy import delete, func, insert, select, union, update
+from sqlalchemy import delete, func, select, union, update
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from tth.common.events.models import (
     CreateEventModel,
     EventFeatureModel,
+    EventFromMtsModel,
     EventModel,
     EventPaginationModel,
     EventWithFeaturesModel,
@@ -19,6 +24,10 @@ from tth.db.models import EventFeature as EventFeatureDb
 from tth.db.models import Feature as FeatureDb
 from tth.db.models import PlaceFeature as PlaceFeatureDb
 from tth.db.utils import inject_session
+
+log = logging.getLogger(__name__)
+
+INSERT_CHUNK_SIZE = 500
 
 
 class IEventStorage(abc.ABC):
@@ -53,6 +62,12 @@ class IEventStorage(abc.ABC):
 
     @abc.abstractmethod
     async def pagination(self, limit: int, offset: int) -> EventPaginationModel:
+        raise NotImplementedError
+
+    async def save_many_from_mts(
+        self,
+        events: Iterable[EventFromMtsModel],
+    ) -> Sequence[int]:
         raise NotImplementedError
 
 
@@ -199,3 +214,47 @@ class EventStorage(IEventStorage):
         stmt = select(EventDb).order_by(EventDb.id).offset(offset).limit(limit)
         result = await session.scalars(stmt)
         return result.all()
+
+    @inject_session
+    async def save_many_from_mts(
+        self,
+        session: AsyncSession,
+        events: Iterable[EventFromMtsModel],
+    ) -> Sequence[int]:
+        def split_every(n: int, iterable: Iterable) -> Iterable:
+            i = iter(iterable)
+            piece = list(islice(i, n))
+            while piece:
+                yield piece
+                piece = list(islice(i, n))
+
+        event_ids: list[int] = []
+        for events_chunk in split_every(INSERT_CHUNK_SIZE, events):
+
+            stmt: Any = insert(EventDb).values([
+                {
+                    "id": event_data.id,
+                    "name": event_data.title,
+                    "place_id": event_data.venue.id,
+                    "url": event_data.url,
+                    "image_url": event_data.image_url,
+                    "event_type": event_data.event_type,
+                } for event_data in events_chunk
+            ])
+
+            stmt = stmt.on_conflict_do_update(
+                index_elements=[EventDb.id],
+                set_={
+                    "name": stmt.excluded.name,
+                    "place_id": stmt.excluded.place_id,
+                    "url": stmt.excluded.url,
+                    "image_url": stmt.excluded.image_url,
+                    "event_type": stmt.excluded.event_type,
+                }
+            ).returning(EventDb.id)
+
+            result = await session.scalars(stmt)
+            event_ids.extend(result.all())
+
+        await session.commit()
+        return event_ids

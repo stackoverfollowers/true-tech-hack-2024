@@ -7,7 +7,7 @@ from tth.cron.parser import MtsPlacesParser
 log = logging.getLogger(__name__)
 
 
-class PlaceFetcher(CronService):
+class CronDataLoader(CronService):
     __dependencies__ = (
         "mts_parser",
     )
@@ -20,6 +20,6 @@ class PlaceFetcher(CronService):
         log.info("Finishing cron callback")
 
     async def start(self) -> None:
-        # run the job every 5 minutes
-        self.register(self.callback, spec="*/5 * * * *")
+        # run the job every 20 minutes
+        self.register(self.callback, spec="*/20 * * * *", )
         await super().start()
