@@ -2,10 +2,12 @@ from collections.abc import Sequence
 from datetime import datetime
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
+from tth.common.constants import MTS_DOMAIN
 from tth.common.models.pagination import MetaPaginationModel
-from tth.db.models import FeatureValue
+from tth.common.places.models import PlaceInEventFromMtsModel
+from tth.db.models import EventType, FeatureValue
 
 
 class EventModel(BaseModel):
@@ -14,9 +16,12 @@ class EventModel(BaseModel):
     id: int
     place_id: int
     name: str
-    description: str
-    started_at: datetime
-    ended_at: datetime
+    event_type: EventType
+    url: str
+    image_url: str
+    description: str | None
+    started_at: datetime | None
+    ended_at: datetime | None
     created_at: datetime
     updated_at: datetime
 
@@ -24,6 +29,9 @@ class EventModel(BaseModel):
 class CreateEventModel(BaseModel):
     place_id: int
     name: str
+    event_type: EventType
+    url: str
+    image_url: str
     description: str
     started_at: datetime
     ended_at: datetime
@@ -43,6 +51,9 @@ class EventWithFeaturesModel(BaseModel):
     id: int
     place_id: int
     name: str
+    event_type: EventType
+    url: str
+    image_url: str
     description: str
     started_at: datetime
     ended_at: datetime
@@ -73,5 +84,30 @@ class EventPaginationModel(BaseModel):
 class UpdateEventModel(BaseModel):
     name: str | None = None
     description: str | None = None
+    event_type: EventType | None = None
+    url: str | None = None
+    image_url: str | None = None
     started_at: datetime | None = None
     ended_at: datetime | None = None
+
+
+class EventFromMtsModel(BaseModel):
+    id: int
+    title: str
+    alias: str
+    url: str
+    image_url: str = Field(alias="imageUrl")
+    venue: PlaceInEventFromMtsModel
+    event_type: EventType | None = None
+
+    def model_post_init(self, __context: Any) -> None:
+        if not self.url.startswith(MTS_DOMAIN):
+            self.url = MTS_DOMAIN + self.url
+
+        if not self.image_url.startswith(MTS_DOMAIN):
+            self.image_url = MTS_DOMAIN + self.image_url
+
+
+class RegionEventsMtsModel(BaseModel):
+    total: int
+    items: Sequence[EventFromMtsModel]

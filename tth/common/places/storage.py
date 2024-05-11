@@ -1,14 +1,17 @@
 import abc
 import asyncio
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
+from typing import Any
 
-from sqlalchemy import delete, func, insert, select, update
+from sqlalchemy import delete, func, select, update
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from tth.common.places.models import (
     CreatePlaceModel,
     PlaceFeatureModel,
+    PlaceFromMtsModel,
     PlaceModel,
     PlacePaginationModel,
     PlaceWithFeaturesModel,
@@ -54,6 +57,13 @@ class IPlaceStorage(abc.ABC):
     async def pagination(self, limit: int, offset: int) -> PlacePaginationModel:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    async def save_many_from_mts(
+        self,
+        places: Iterable[PlaceFromMtsModel]
+    ) -> Sequence[int]:
+        raise NotImplementedError
+
 
 @dataclass(frozen=True)
 class PlaceStorage(IPlaceStorage):
@@ -93,6 +103,8 @@ class PlaceStorage(IPlaceStorage):
             name=place.name,
             description=place.description,
             address=place.address,
+            url=place.url,
+            image_url=place.image_url,
             created_at=place.created_at,
             updated_at=place.updated_at,
             features=[
@@ -111,7 +123,9 @@ class PlaceStorage(IPlaceStorage):
             .values(
                 name=new_place.name,
                 description=new_place.description,
-                address=new_place.address
+                address=new_place.address,
+                url=new_place.url,
+                image_url=new_place.image_url,
             )
             .returning(PlaceDb)
         )
@@ -180,3 +194,34 @@ class PlaceStorage(IPlaceStorage):
         stmt = select(PlaceDb).order_by(PlaceDb.id).offset(offset).limit(limit)
         result = await session.scalars(stmt)
         return result.all()
+
+    @inject_session
+    async def save_many_from_mts(
+        self,
+        places: Iterable[PlaceFromMtsModel],
+        session: AsyncSession,
+    ) -> Sequence[int]:
+        stmt: Any = insert(PlaceDb).values([
+            {"id": place_data.id,
+             "name": place_data.title,
+             "address": place_data.address,
+             "url": place_data.url,
+             "image_url": place_data.image_url,
+             } for place_data in places
+        ])
+
+        stmt = stmt.on_conflict_do_update(
+            index_elements=[PlaceDb.id],
+            set_={
+                "name": stmt.excluded.name,
+                "address": stmt.excluded.address,
+                "url": stmt.excluded.url,
+                "image_url": stmt.excluded.image_url,
+            }
+        ).returning(PlaceDb.id)
+
+        place_ids = await session.scalars(stmt)
+
+        await session.commit()
+
+        return place_ids.all()
