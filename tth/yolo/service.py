@@ -3,7 +3,9 @@ import logging
 from aio_pika.patterns import Master
 from aiomisc import Service
 
+from tth.common.features.storage import FeatureStorage
 from tth.common.places.storage import PlaceStorage
+from tth.db.models import FeatureValue
 from tth.yolo.recognizer import Recognizer
 
 log = logging.getLogger(__name__)
@@ -11,10 +13,16 @@ log = logging.getLogger(__name__)
 
 class YoloService(Service):
     __required__ = ("queue_name",)
-    __dependencies__ = ("recognizer", "amqp_master", "place_storage")
+    __dependencies__ = (
+        "recognizer",
+        "amqp_master",
+        "place_storage",
+        "feature_storage",
+    )
 
     amqp_master: Master
     recognizer: Recognizer
+    feature_storage: FeatureStorage
     place_storage: PlaceStorage
     queue_name: str
 
@@ -32,5 +40,14 @@ class YoloService(Service):
             place_id,
             image_url,
         )
-        objs = await self.recognizer.detect_ramp_stair(image_url)
-        log.info("Result: %s", objs)
+        recognized_features = await self.recognizer.recognize(image_url)
+        log.info("Result: %s", recognized_features)
+        for feature_slug in recognized_features:
+            feature = await self.feature_storage.get_by_slug(slug=feature_slug)
+            if feature is None:
+                continue
+            await self.place_storage.add_feature(
+                place_id=place_id,
+                feature_id=feature.id,
+                value=FeatureValue.AVAILABLE,
+            )

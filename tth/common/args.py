@@ -69,4 +69,4 @@ class YoloGroup(argclass.Group):
 
 
 class ParserGroup(argclass.Group):
-    cron_spec: str = argclass.Argument(type=str, default="*/30 * * * *")
+    cron_spec: str = argclass.Argument(type=str, default="*/43 * * * *")
