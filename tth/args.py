@@ -18,6 +18,12 @@ class Parser(argclass.Parser):
         default=False,
         type=lambda x: x.lower() == "true",
     )
+    with_cache: bool = argclass.Argument(
+        "-C",
+        "--with-cache",
+        default=True,
+        type=lambda x: x.lower() == "true",
+    )
     pool_size: int = argclass.Argument(
         "-s", "--pool-size", type=int, default=4, help="Thread pool size"
     )

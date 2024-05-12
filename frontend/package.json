@@ -1,0 +1,57 @@
+{
+  "name": "client-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode development --host",
+    "build": "vite build --debug",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint --fix --ext .ts,.tsx ./src",
+    "stylelint": "stylelint \"src/**/*.css\"",
+    "stylelint:fix": "stylelint --fix \"src/**/*.css\"",
+    "preview": "vite preview",
+    "prepare": "cd .. && npx husky frontend/.husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "eslint --cache --fix",
+    "*": "prettier --write --ignore-unknown",
+    "*.css": "stylelint --fix"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@fontsource/roboto": "^5.0.12",
+    "@mui/icons-material": "^5.15.15",
+    "@mui/material": "^5.15.15",
+    "@tanstack/react-query": "^5.29.0",
+    "axios": "^1.6.8",
+    "clsx": "^2.1.0",
+    "effector": "^23.2.0",
+    "effector-react": "^23.2.0",
+    "patronum": "^2.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3"
+  },
+  "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.28.11",
+    "@types/node": "^20.12.5",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.2",
+    "prettier": "3.2.5",
+    "stylelint": "^16.3.1",
+    "stylelint-config-standard": "^36.0.0",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
+  }
+}
