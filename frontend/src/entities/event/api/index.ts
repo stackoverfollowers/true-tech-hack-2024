@@ -32,7 +32,7 @@ type UseGetEvents = Pagination<EventsResponse[]>;
 
 export const useGetEvents = () => {
   return useQuery<UseGetEvents>({
-    queryKey,
+    queryKey: ['events'],
     queryFn: getEvents,
   });
 };
