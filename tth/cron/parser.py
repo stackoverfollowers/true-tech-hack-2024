@@ -53,7 +53,7 @@ class MtsPlacesParser:
     async def send_recognition_tasks(self, place_ids: set[int]) -> None:
         places = await self.place_storage.get_many(place_ids=place_ids)
         for place in places:
-            if place.image_url.contains("/error.png"):
+            if "/error.png" in place.image_url:
                 continue
             await self.amqp_master.create_task(
                 channel_name=self.queue_name,

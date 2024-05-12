@@ -2,7 +2,12 @@ import re
 from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, MetaData, text
-from sqlalchemy.orm import Mapped, as_declarative, declared_attr, mapped_column
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    declared_attr,
+    mapped_column,
+)
 
 convention = {
     "all_column_names": lambda constraint, table: "_".join(
@@ -18,9 +23,8 @@ convention = {
 metadata = MetaData(naming_convention=convention)  # type:ignore[arg-type]
 
 
-@as_declarative(metadata=metadata)
-class Base:
-    metadata: MetaData
+class Base(DeclarativeBase):
+    metadata = metadata
 
     @declared_attr.directive
     @classmethod

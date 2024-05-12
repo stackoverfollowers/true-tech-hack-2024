@@ -50,7 +50,7 @@ class PlaceWithFeaturesModel(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    features: Sequence[FeatureValue]
+    features: Sequence[PlaceFeatureModel]
 
 
 class PlacePaginationModel(BaseModel):

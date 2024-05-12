@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from tth.common.args import AMQPGroup, DatabaseGroup
 from tth.common.events.storage import EventStorage
+from tth.common.features.storage import FeatureStorage
 from tth.common.places.storage import PlaceStorage
 from tth.common.users.storage import UserStorage
 from tth.db.utils import (
@@ -53,6 +54,12 @@ def config_deps(db: DatabaseGroup, debug: bool, amqp: AMQPGroup) -> None:
         session_factory: async_sessionmaker[AsyncSession],
     ) -> PlaceStorage:
         return PlaceStorage(session_factory=session_factory)
+
+    @dependency
+    def feature_storage(
+        session_factory: async_sessionmaker[AsyncSession],
+    ) -> FeatureStorage:
+        return FeatureStorage(session_factory=session_factory)
 
     @dependency
     async def amqp_conn() -> AsyncIterator[AbstractConnection]:

@@ -21,4 +21,5 @@ class CronDataLoader(CronService):
 
     async def start(self) -> None:
         self.register(self.callback, spec=self.cron_spec)
+        log.info("Starting cron service with spec: %s", self.cron_spec)
         await super().start()
