@@ -10,12 +10,6 @@ services:
     ports:
       - 5432:5432
 
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-    ports:
-      - 6379:6379
-
   rabbitmq:
     image: rabbitmq:3.13-management
     restart: unless-stopped
