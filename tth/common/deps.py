@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from tth.args import Parser
 from tth.common.events.storage import EventStorage, IEventStorage
+from tth.common.places.storage import IPlaceStorage, PlaceStorage
 from tth.common.users.storage import UserStorage
 from tth.db.utils import (
     create_async_engine,
@@ -40,3 +41,9 @@ def config_deps(parser: Parser) -> None:
         session_factory: async_sessionmaker[AsyncSession],
     ) -> IEventStorage:
         return EventStorage(session_factory=session_factory)
+
+    @dependency
+    def place_storage(
+        session_factory: async_sessionmaker[AsyncSession],
+    ) -> IPlaceStorage:
+        return PlaceStorage(session_factory=session_factory)

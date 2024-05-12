@@ -6,38 +6,31 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from tth.common.constants import MTS_DOMAIN
 from tth.common.models.pagination import MetaPaginationModel
-from tth.common.places.models import PlaceInEventFromMtsModel
-from tth.db.models import EventType, FeatureValue
+from tth.db.models import FeatureValue
 
 
-class EventModel(BaseModel):
+class PlaceModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    place_id: int
     name: str
-    event_type: EventType
     url: str
     image_url: str
     description: str | None
-    started_at: datetime | None
-    ended_at: datetime | None
+    address: str
     created_at: datetime
     updated_at: datetime
 
 
-class CreateEventModel(BaseModel):
-    place_id: int
+class CreatePlaceModel(BaseModel):
     name: str
-    event_type: EventType
     url: str
     image_url: str
     description: str
-    started_at: datetime
-    ended_at: datetime
+    address: str
 
 
-class EventFeatureModel(BaseModel):
+class PlaceFeatureModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     name: str
@@ -45,27 +38,24 @@ class EventFeatureModel(BaseModel):
     value: FeatureValue
 
 
-class EventWithFeaturesModel(BaseModel):
+class PlaceWithFeaturesModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    place_id: int
     name: str
-    event_type: EventType
     url: str
     image_url: str
     description: str
-    started_at: datetime
-    ended_at: datetime
+    address: str
     created_at: datetime
     updated_at: datetime
 
     features: Sequence[FeatureValue]
 
 
-class EventPaginationModel(BaseModel):
+class PlacePaginationModel(BaseModel):
     meta: MetaPaginationModel
-    items: Sequence[EventModel]
+    items: Sequence[PlaceModel]
 
     @classmethod
     def build(
@@ -77,28 +67,24 @@ class EventPaginationModel(BaseModel):
     ) -> Self:
         return cls(
             meta=MetaPaginationModel(limit=limit, offset=offset, total=total),
-            items=[EventModel.model_validate(item) for item in items],
+            items=[PlaceModel.model_validate(item) for item in items],
         )
 
 
-class UpdateEventModel(BaseModel):
+class UpdatePlaceModel(BaseModel):
     name: str | None = None
     description: str | None = None
-    event_type: EventType | None = None
+    address: str | None = None
     url: str | None = None
     image_url: str | None = None
-    started_at: datetime | None = None
-    ended_at: datetime | None = None
 
 
-class EventFromMtsModel(BaseModel):
+class PlaceFromMtsModel(BaseModel):
     id: int
     title: str
-    alias: str
+    address: str
     url: str
     image_url: str = Field(alias="imageUrl")
-    venue: PlaceInEventFromMtsModel
-    event_type: EventType | None = None
 
     def model_post_init(self, __context: Any) -> None:
         if not self.url.startswith(MTS_DOMAIN):
@@ -108,6 +94,12 @@ class EventFromMtsModel(BaseModel):
             self.image_url = MTS_DOMAIN + self.image_url
 
 
-class RegionEventsMtsModel(BaseModel):
+class PlaceInEventFromMtsModel(BaseModel):
+    id: int
+    title: str
+    url: str
+
+
+class RegionPlacesMtsModel(BaseModel):
     total: int
-    items: Sequence[EventFromMtsModel]
+    items: Sequence[PlaceFromMtsModel]

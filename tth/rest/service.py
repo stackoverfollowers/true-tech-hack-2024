@@ -11,6 +11,7 @@ from tth.common.exceptions import (
     HackTemplateException,
     UserWithUsernameAlreadyExistsException,
 )
+from tth.common.places.storage import IPlaceStorage
 from tth.common.users.storage import UserStorage
 from tth.rest.api.router import router as api_router
 from tth.rest.auth.base import SecurityManager
@@ -26,6 +27,7 @@ from tth.rest.overrides import (
     REQUIRE_AUTH,
     REQUIRE_REGULAR_AUTH,
     GetEventStorage,
+    GetPlaceStorage,
     GetSessionFactory,
     GetUserDispatcher,
     GetUserStorage,
@@ -49,6 +51,7 @@ class REST(UvicornService):
         "security_manager",
         "user_dispatcher",
         "event_storage",
+        "place_storage",
     )
 
     EXCEPTION_HANDLERS: ExceptionHandlersType = (
@@ -69,6 +72,7 @@ class REST(UvicornService):
     user_storage: UserStorage
     user_dispatcher: UserDispatcher
     event_storage: IEventStorage
+    place_storage: IPlaceStorage
 
     async def create_application(self) -> UvicornApplication:
         app = FastAPI(
@@ -108,5 +112,6 @@ class REST(UvicornService):
                 GetUserStorage: lambda: self.user_storage,
                 GetUserDispatcher: lambda: self.user_dispatcher,
                 GetEventStorage: lambda: self.event_storage,
+                GetPlaceStorage: lambda: self.place_storage,
             }
         )

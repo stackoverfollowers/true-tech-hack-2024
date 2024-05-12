@@ -19,6 +19,10 @@ class GetEventStorage:
     pass
 
 
+class GetPlaceStorage:
+    pass
+
+
 class MaybeAuth(APIKeyHeader):
     pass
 
