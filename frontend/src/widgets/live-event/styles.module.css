@@ -98,7 +98,6 @@
   align-items: center;
   gap: 4px;
 }
-<<<<<<< HEAD
 
 .place {
   display: flex;
@@ -109,5 +108,3 @@
     text-decoration: underline;
   }
 }
-=======
->>>>>>> b1bf078 (refactor: styles)
