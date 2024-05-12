@@ -23,7 +23,7 @@ const getPlaceById = async (id: number, { signal }: { signal: AbortSignal }) => 
 };
 
 export const useGetPlaceById = (id: number) => {
-  return useQuery<any>({
+  return useQuery<Place>({
     queryKey,
     queryFn: ({signal}) => getPlaceById(id, {signal}),
   });
