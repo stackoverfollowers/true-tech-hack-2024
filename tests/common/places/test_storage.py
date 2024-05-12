@@ -1,23 +1,18 @@
-from datetime import datetime
-
 import pytest
 
 from tests.plugins.factories.places import PlaceMtsFactory
-from tth.common.events.models import (
-    CreateEventModel,
-    EventModel,
-    EventPaginationModel,
-    EventWithFeaturesModel,
-    UpdateEventModel,
+from tth.common.places.models import (
+    CreatePlaceModel,
+    PlaceModel,
+    PlacePaginationModel,
+    PlaceWithFeaturesModel,
+    UpdatePlaceModel,
 )
-from tth.common.events.storage import IEventStorage
-from tth.common.places.models import CreatePlaceModel, PlaceModel, PlaceWithFeaturesModel, UpdatePlaceModel, \
-    PlacePaginationModel, PlaceFromMtsModel
-from tth.common.places.storage import IPlaceStorage
+from tth.common.places.storage import PlaceStorage
 
 
 async def test_create_place__ok(
-    place_storage: IPlaceStorage,
+    place_storage: PlaceStorage,
     read_place,
 ):
     place = await place_storage.create(
@@ -33,10 +28,7 @@ async def test_create_place__ok(
     assert place == await read_place(place.id)
 
 
-async def test_get_place_by_id__ok(
-    place_storage: IPlaceStorage,
-    create_place
-):
+async def test_get_place_by_id__ok(place_storage: PlaceStorage, create_place):
     place = await create_place()
 
     assert await place_storage.get_by_id(
@@ -44,12 +36,12 @@ async def test_get_place_by_id__ok(
     ) == PlaceModel.model_validate(place)
 
 
-async def test_get_place_by_id__not_found(place_storage: IPlaceStorage):
+async def test_get_place_by_id__not_found(place_storage: PlaceStorage):
     assert await place_storage.get_by_id(place_id=1) is None
 
 
 async def test_get_place_by_id_with_features_not_features__ok(
-    place_storage: IPlaceStorage,
+    place_storage: PlaceStorage,
     create_place,
 ):
     place = await create_place()
@@ -69,16 +61,16 @@ async def test_get_place_by_id_with_features_not_features__ok(
     )
 
 
-async def test_get_place_by_id_with_features__ok(place_storage: IPlaceStorage):
+async def test_get_place_by_id_with_features__ok(place_storage: PlaceStorage):
     pass
 
 
-async def test_get_place_by_id_with_features__not_found(place_storage: IPlaceStorage):
+async def test_get_place_by_id_with_features__not_found(place_storage: PlaceStorage):
     assert await place_storage.get_by_id_with_features(place_id=1) is None
 
 
 async def test_update_event__ok(
-    place_storage: IPlaceStorage,
+    place_storage: PlaceStorage,
     create_place,
     read_place,
 ):
@@ -90,12 +82,12 @@ async def test_update_event__ok(
     assert (await read_place(place.id)).name == "Updated place name"
 
 
-async def test_delete_empty_place__ok(place_storage: IPlaceStorage):
+async def test_delete_empty_place__ok(place_storage: PlaceStorage):
     await place_storage.delete(place_id=-1)
 
 
 async def test_delete_place__ok(
-    place_storage: IPlaceStorage,
+    place_storage: PlaceStorage,
     create_place,
     read_place,
 ):
@@ -106,7 +98,7 @@ async def test_delete_place__ok(
 
 
 async def test_pagination__ok(
-    place_storage: IPlaceStorage,
+    place_storage: PlaceStorage,
     create_place,
 ):
     places = [await create_place() for _ in range(3)]
@@ -116,7 +108,7 @@ async def test_pagination__ok(
     )
 
 
-async def test_pagination_empty__ok(place_storage: IPlaceStorage):
+async def test_pagination_empty__ok(place_storage: PlaceStorage):
     pagination = await place_storage.pagination(limit=10, offset=0)
     assert pagination == PlacePaginationModel.build(
         limit=10, offset=0, total=0, items=[]
@@ -125,10 +117,7 @@ async def test_pagination_empty__ok(place_storage: IPlaceStorage):
 
 @pytest.mark.parametrize(("limit", "result"), ((0, 0), (3, 3), (5, 3)))
 async def test_pagination_limit__ok(
-    place_storage: IPlaceStorage,
-    limit: int,
-    result: int,
-    create_place
+    place_storage: PlaceStorage, limit: int, result: int, create_place
 ):
     [await create_place() for _ in range(3)]
     pagination = await place_storage.pagination(limit=limit, offset=0)
@@ -137,7 +126,7 @@ async def test_pagination_limit__ok(
 
 @pytest.mark.parametrize(("offset", "result"), ((0, 4), (3, 1), (5, 0)))
 async def test_pagination_offset__ok(
-    place_storage: IPlaceStorage,
+    place_storage: PlaceStorage,
     offset: int,
     result: int,
     create_place,
@@ -148,7 +137,7 @@ async def test_pagination_offset__ok(
 
 
 async def test_save_many_from_mts__save_one(
-    place_storage: IPlaceStorage,
+    place_storage: PlaceStorage,
 ):
     place_from_mts = PlaceMtsFactory()
     await place_storage.save_many_from_mts([place_from_mts])
@@ -163,14 +152,12 @@ async def test_save_many_from_mts__save_one(
 
 
 async def test_save_many_from_mts__ok(
-    place_storage: IPlaceStorage,
+    place_storage: PlaceStorage,
 ):
     places_from_mts = [PlaceMtsFactory() for _ in range(3)]
     places_ids = [p.id for p in places_from_mts]
 
-    saved_places_ids = await place_storage.save_many_from_mts(
-        places_from_mts
-    )
+    saved_places_ids = await place_storage.save_many_from_mts(places_from_mts)
 
     assert set(saved_places_ids) == set(places_ids)
 
@@ -190,12 +177,9 @@ async def test_save_many_from_mts__with_conflict(
     existing_place = await create_place()
     place_from_mts = PlaceMtsFactory(id=existing_place.id)
 
-    updated_place_ids = await place_storage.save_many_from_mts(
-        [place_from_mts]
-    )
+    updated_place_ids = await place_storage.save_many_from_mts([place_from_mts])
 
-    updated_place = await place_storage.get_by_id(
-        place_id=updated_place_ids[0])
+    updated_place = await place_storage.get_by_id(place_id=updated_place_ids[0])
 
     assert updated_place.id == place_from_mts.id
     assert updated_place.url == place_from_mts.url

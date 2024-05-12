@@ -48,7 +48,7 @@ alembic-downgrade:  ##@Database Run alembic downgrade to previous version
 	.venv/bin/python -m $(PROJECT_NAME).db --pg-dsn=$(APP_DB_PG_DSN) downgrade -1
 
 alembic-revision:  ##@Database New alembic revision
-	.venv/bin/python -m $(PROJECT_NAME).db --pg-dsn=$(APP_DB_PG_DSN) revision --autogenerate
+	.venv/bin/python -m $(PROJECT_NAME).db --pg-dsn=$(APP_DB_PG_DSN) revision --autogenerate -m "Initial revision"
 
 docker-alembic-upgrade-head: ##@Database Run alembic upgrade head in docker
 	docker-compose exec backend python -m $(PROJECT_NAME).db upgrade head

@@ -1,4 +1,3 @@
-import abc
 import asyncio
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
@@ -23,50 +22,8 @@ from tth.db.models import PlaceFeature as PlaceFeatureDb
 from tth.db.utils import inject_session
 
 
-class IPlaceStorage(abc.ABC):
-    @abc.abstractmethod
-    async def get_by_id(self, place_id: int) -> PlaceModel | None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def get_by_id_with_features(
-        self, place_id: int
-    ) -> PlaceWithFeaturesModel | None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def create(
-        self,
-        new_place: CreatePlaceModel,
-    ) -> PlaceModel:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def update(
-        self,
-        place_id: int,
-        update_place: UpdatePlaceModel,
-    ) -> PlaceModel:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def delete(self, place_id: int) -> None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def pagination(self, limit: int, offset: int) -> PlacePaginationModel:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def save_many_from_mts(
-        self,
-        places: Iterable[PlaceFromMtsModel]
-    ) -> Sequence[int]:
-        raise NotImplementedError
-
-
 @dataclass(frozen=True)
-class PlaceStorage(IPlaceStorage):
+class PlaceStorage:
     session_factory: async_sessionmaker[AsyncSession]
 
     @inject_session
@@ -201,14 +158,18 @@ class PlaceStorage(IPlaceStorage):
         places: Iterable[PlaceFromMtsModel],
         session: AsyncSession,
     ) -> Sequence[int]:
-        stmt: Any = insert(PlaceDb).values([
-            {"id": place_data.id,
-             "name": place_data.title,
-             "address": place_data.address,
-             "url": place_data.url,
-             "image_url": place_data.image_url,
-             } for place_data in places
-        ])
+        stmt: Any = insert(PlaceDb).values(
+            [
+                {
+                    "id": place_data.id,
+                    "name": place_data.title,
+                    "address": place_data.address,
+                    "url": place_data.url,
+                    "image_url": place_data.image_url,
+                }
+                for place_data in places
+            ]
+        )
 
         stmt = stmt.on_conflict_do_update(
             index_elements=[PlaceDb.id],
@@ -217,7 +178,7 @@ class PlaceStorage(IPlaceStorage):
                 "address": stmt.excluded.address,
                 "url": stmt.excluded.url,
                 "image_url": stmt.excluded.image_url,
-            }
+            },
         ).returning(PlaceDb.id)
 
         place_ids = await session.scalars(stmt)
@@ -225,3 +186,11 @@ class PlaceStorage(IPlaceStorage):
         await session.commit()
 
         return place_ids.all()
+
+    @inject_session
+    async def get_many(
+        self, session: AsyncSession, place_ids: Sequence[int]
+    ) -> Sequence[PlaceModel]:
+        query = select(PlaceDb).where(PlaceDb.id.in_(place_ids))
+        result = await session.scalars(query)
+        return [PlaceModel.model_validate(row) for row in result.all()]

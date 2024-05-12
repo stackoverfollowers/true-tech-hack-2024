@@ -1,11 +1,11 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from tth.common.places.storage import PlaceStorage, IPlaceStorage
+from tth.common.places.storage import PlaceStorage
 
 
 @pytest.fixture
 def place_storage(
     session_factory: async_sessionmaker[AsyncSession],
-) -> IPlaceStorage:
+) -> PlaceStorage:
     return PlaceStorage(session_factory=session_factory)

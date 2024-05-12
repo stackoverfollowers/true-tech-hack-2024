@@ -1,4 +1,3 @@
-import abc
 import asyncio
 import logging
 from collections.abc import Iterable, Sequence
@@ -30,49 +29,8 @@ log = logging.getLogger(__name__)
 INSERT_CHUNK_SIZE = 500
 
 
-class IEventStorage(abc.ABC):
-    @abc.abstractmethod
-    async def get_by_id(self, event_id: int) -> EventModel | None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def get_by_id_with_features(
-        self, event_id: int
-    ) -> EventWithFeaturesModel | None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def create(
-        self,
-        new_event: CreateEventModel,
-    ) -> EventModel:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def update(
-        self,
-        event_id: int,
-        update_event: UpdateEventModel,
-    ) -> EventModel:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def delete(self, event_id: int) -> None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def pagination(self, limit: int, offset: int) -> EventPaginationModel:
-        raise NotImplementedError
-
-    async def save_many_from_mts(
-        self,
-        events: Iterable[EventFromMtsModel],
-    ) -> Sequence[int]:
-        raise NotImplementedError
-
-
 @dataclass(frozen=True)
-class EventStorage(IEventStorage):
+class EventStorage:
     session_factory: async_sessionmaker[AsyncSession]
 
     @inject_session
@@ -221,26 +179,21 @@ class EventStorage(IEventStorage):
         session: AsyncSession,
         events: Iterable[EventFromMtsModel],
     ) -> Sequence[int]:
-        def split_every(n: int, iterable: Iterable) -> Iterable:
-            i = iter(iterable)
-            piece = list(islice(i, n))
-            while piece:
-                yield piece
-                piece = list(islice(i, n))
-
         event_ids: list[int] = []
         for events_chunk in split_every(INSERT_CHUNK_SIZE, events):
-
-            stmt: Any = insert(EventDb).values([
-                {
-                    "id": event_data.id,
-                    "name": event_data.title,
-                    "place_id": event_data.venue.id,
-                    "url": event_data.url,
-                    "image_url": event_data.image_url,
-                    "event_type": event_data.event_type,
-                } for event_data in events_chunk
-            ])
+            stmt: Any = insert(EventDb).values(
+                [
+                    {
+                        "id": event_data.id,
+                        "name": event_data.title,
+                        "place_id": event_data.venue.id,
+                        "url": event_data.url,
+                        "image_url": event_data.image_url,
+                        "event_type": event_data.event_type,
+                    }
+                    for event_data in events_chunk
+                ]
+            )
 
             stmt = stmt.on_conflict_do_update(
                 index_elements=[EventDb.id],
@@ -250,7 +203,7 @@ class EventStorage(IEventStorage):
                     "url": stmt.excluded.url,
                     "image_url": stmt.excluded.image_url,
                     "event_type": stmt.excluded.event_type,
-                }
+                },
             ).returning(EventDb.id)
 
             result = await session.scalars(stmt)
@@ -258,3 +211,11 @@ class EventStorage(IEventStorage):
 
         await session.commit()
         return event_ids
+
+
+def split_every(n: int, iterable: Iterable) -> Iterable:
+    i = iter(iterable)
+    piece = list(islice(i, n))
+    while piece:
+        yield piece
+        piece = list(islice(i, n))

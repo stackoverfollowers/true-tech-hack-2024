@@ -2,7 +2,6 @@ from datetime import datetime
 
 import pytest
 
-from tests.plugins.factories.events import EventMtsFactory
 from tth.common.events.models import (
     CreateEventModel,
     EventModel,
@@ -10,12 +9,12 @@ from tth.common.events.models import (
     EventWithFeaturesModel,
     UpdateEventModel,
 )
-from tth.common.events.storage import IEventStorage
+from tth.common.events.storage import EventStorage
 from tth.db.models import EventType
 
 
 async def test_create_event__ok(
-    event_storage: IEventStorage,
+    event_storage: EventStorage,
     read_event,
     create_place,
 ):
@@ -36,7 +35,7 @@ async def test_create_event__ok(
 
 
 async def test_get_event_by_id__ok(
-    event_storage: IEventStorage, create_event, create_place
+    event_storage: EventStorage, create_event, create_place
 ):
     place = await create_place()
     event = await create_event(
@@ -47,12 +46,12 @@ async def test_get_event_by_id__ok(
     ) == EventModel.model_validate(event)
 
 
-async def test_get_event_by_id__not_found(event_storage: IEventStorage):
+async def test_get_event_by_id__not_found(event_storage: EventStorage):
     assert await event_storage.get_by_id(event_id=1) is None
 
 
 async def test_get_event_by_id_with_features_not_features__ok(
-    event_storage: IEventStorage, create_place, create_event
+    event_storage: EventStorage, create_place, create_event
 ):
     place = await create_place()
     event = await create_event(
@@ -76,16 +75,16 @@ async def test_get_event_by_id_with_features_not_features__ok(
     )
 
 
-async def test_get_event_by_id_with_features__ok(event_storage: IEventStorage):
+async def test_get_event_by_id_with_features__ok(event_storage: EventStorage):
     pass
 
 
-async def test_get_event_by_id_with_features__not_found(event_storage: IEventStorage):
+async def test_get_event_by_id_with_features__not_found(event_storage: EventStorage):
     assert await event_storage.get_by_id_with_features(event_id=1) is None
 
 
 async def test_update_event__ok(
-    event_storage: IEventStorage, create_place, create_event, read_event
+    event_storage: EventStorage, create_place, create_event, read_event
 ):
     place = await create_place()
     event = await create_event(
@@ -98,12 +97,12 @@ async def test_update_event__ok(
     assert (await read_event(event.id)).name == "New event name"
 
 
-async def test_delete_empty_event__ok(event_storage: IEventStorage):
+async def test_delete_empty_event__ok(event_storage: EventStorage):
     await event_storage.delete(event_id=-1)
 
 
 async def test_delete_event__ok(
-    event_storage: IEventStorage, create_place, create_event, read_event
+    event_storage: EventStorage, create_place, create_event, read_event
 ):
     place = await create_place()
     event = await create_event(
@@ -113,7 +112,7 @@ async def test_delete_event__ok(
     assert await read_event(event.id) is None
 
 
-async def test_pagination__ok(event_storage: IEventStorage, create_place, create_event):
+async def test_pagination__ok(event_storage: EventStorage, create_place, create_event):
     place = await create_place()
     events = [await create_event(place_id=place.id) for _ in range(3)]
     pagination = await event_storage.pagination(limit=10, offset=1)
@@ -122,7 +121,7 @@ async def test_pagination__ok(event_storage: IEventStorage, create_place, create
     )
 
 
-async def test_pagination_empty__ok(event_storage: IEventStorage):
+async def test_pagination_empty__ok(event_storage: EventStorage):
     pagination = await event_storage.pagination(limit=10, offset=0)
     assert pagination == EventPaginationModel.build(
         limit=10, offset=0, total=0, items=[]
@@ -131,7 +130,7 @@ async def test_pagination_empty__ok(event_storage: IEventStorage):
 
 @pytest.mark.parametrize(("limit", "result"), ((0, 0), (3, 3), (5, 3)))
 async def test_pagination_limit__ok(
-    event_storage: IEventStorage,
+    event_storage: EventStorage,
     limit: int,
     result: int,
     create_place,
@@ -145,7 +144,7 @@ async def test_pagination_limit__ok(
 
 @pytest.mark.parametrize(("offset", "result"), ((0, 4), (3, 1), (5, 0)))
 async def test_pagination_offset__ok(
-    event_storage: IEventStorage,
+    event_storage: EventStorage,
     offset: int,
     result: int,
     create_place,
@@ -158,7 +157,7 @@ async def test_pagination_offset__ok(
 
 
 # async def test_save_many_from_mts__save_one(
-#     event_storage: IEventStorage,
+#     event_storage: EventStorage,
 #     create_place,
 # ):
 #     place = await create_place()
@@ -177,7 +176,7 @@ async def test_pagination_offset__ok(
 #
 #
 # async def test_save_many_from_mts__ok(
-#     event_storage: IEventStorage,
+#     event_storage: EventStorage,
 #     create_place
 # ):
 #     place = await create_place()

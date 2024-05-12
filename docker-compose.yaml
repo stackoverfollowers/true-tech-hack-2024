@@ -17,9 +17,15 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
-    image: redis:latest
+  rabbitmq:
+    image: rabbitmq:3.13-management
     restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: $RABBITMQ_USER
+      RABBITMQ_DEFAULT_PASS: $RABBITMQ_PASSWORD
 
   backend:
     build:
@@ -38,6 +44,8 @@ services:
 
       APP_LOG_LEVEL: info
       APP_LOG_FORMAT: json
+
+      APP_AMQP_DSN: $APP_AMQP_DSN
 
     depends_on:
       db:
