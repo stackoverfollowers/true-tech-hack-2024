@@ -39,6 +39,7 @@ export const Header = () => {
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'center',
+            gap: 4,
             p: 2,
           }}
         >
@@ -50,27 +51,27 @@ export const Header = () => {
             />
           </Link>
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <MenuItem sx={{ py: '6px', px: '12px' }}>
+            <MenuItem sx={{ py: '6px', px: '12px' }} selected>
               <Typography variant="h6" color="text.primary">
                 Все события
               </Typography>
             </MenuItem>
-            <MenuItem sx={{ py: '6px', px: '12px' }}>
+            <MenuItem sx={{ py: '6px', px: '12px' }} disabled>
               <Typography variant="h6" color="text.primary">
                 Концерты
               </Typography>
             </MenuItem>
-            <MenuItem sx={{ py: '6px', px: '12px' }}>
+            <MenuItem sx={{ py: '6px', px: '12px' }} disabled>
               <Typography variant="h6" color="text.primary">
                 Театры
               </Typography>
             </MenuItem>
-            <MenuItem sx={{ py: '6px', px: '12px' }}>
+            <MenuItem sx={{ py: '6px', px: '12px' }} disabled>
               <Typography variant="h6" color="text.primary">
                 Мюзиклы
               </Typography>
             </MenuItem>
-            <MenuItem sx={{ py: '6px', px: '12px' }}>
+            <MenuItem sx={{ py: '6px', px: '12px' }} disabled>
               <Typography variant="h6" color="text.primary">
                 Стэндап
               </Typography>
