@@ -119,5 +119,6 @@ module = [
     "argclass.*",
     "async_reduce.*",
     "ultralytics.*",
+    "asyncpg.*",
 ]
 ignore_missing_imports = true
