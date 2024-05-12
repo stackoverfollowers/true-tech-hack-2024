@@ -1,4 +1,5 @@
 from base64 import b64decode
+from pathlib import Path
 
 import argclass
 from aiomisc_log import LogFormat, LogLevel
@@ -51,3 +52,21 @@ class ProjectGroup(argclass.Group):
 
 class DatabaseGroup(argclass.Group):
     pg_dsn: URL = argclass.Argument("--pg-dsn", required=True, type=URL)
+
+
+class AMQPGroup(argclass.Group):
+    dsn: URL = argclass.Argument(type=URL, required=True)
+    prefetch_count: int = argclass.Argument(type=int, default=4)
+    retry_pause_seconds: int = argclass.Argument(type=int, default=60)
+    retry_count_limit: int = argclass.Argument(type=int, default=2)
+    queue_name: str = argclass.Argument(type=str, default="yolo_queue")
+
+
+class YoloGroup(argclass.Group):
+    model_path: Path = argclass.Argument(type=Path, required=True)
+    image_size: int = argclass.Argument(type=int, default=640)
+    conf: float = argclass.Argument(type=float, default=0.5)
+
+
+class ParserGroup(argclass.Group):
+    cron_spec: str = argclass.Argument(type=str, default="*/30 * * * *")

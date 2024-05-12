@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tth.common.constants import MTS_DOMAIN
-from tth.common.places.models import PlaceModel, PlaceFromMtsModel
+from tth.common.places.models import PlaceFromMtsModel, PlaceModel
 from tth.db.models import Place
 
 
@@ -45,6 +45,7 @@ def create_place(session: AsyncSession):
 
     return _create
 
+
 @pytest.fixture
 def create_dummy_place_mts():
     def _create(**kwargs) -> PlaceFromMtsModel:
@@ -65,4 +66,3 @@ def read_place(session: AsyncSession):
         return PlaceModel.model_validate(obj)
 
     return _read_place
-

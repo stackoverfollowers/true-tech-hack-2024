@@ -8,10 +8,10 @@ log = logging.getLogger(__name__)
 
 
 class CronDataLoader(CronService):
-    __dependencies__ = (
-        "mts_parser",
-    )
+    __required__ = ("cron_spec",)
+    __dependencies__ = ("mts_parser",)
 
+    cron_spec: str
     mts_parser: MtsPlacesParser
 
     async def callback(self) -> None:
@@ -20,6 +20,5 @@ class CronDataLoader(CronService):
         log.info("Finishing cron callback")
 
     async def start(self) -> None:
-        # run the job every 20 minutes
-        self.register(self.callback, spec="*/20 * * * *", )
+        self.register(self.callback, spec=self.cron_spec)
         await super().start()

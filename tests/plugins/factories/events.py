@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from tth.common.constants import MTS_DOMAIN
-from tth.common.events.models import EventModel, EventFromMtsModel
+from tth.common.events.models import EventFromMtsModel, EventModel
 from tth.common.places.models import PlaceInEventFromMtsModel
 from tth.db.models import Event, EventType
 
@@ -32,7 +32,6 @@ class EventMtsFactory(factory.Factory):
     class Meta:
         model = EventFromMtsModel
 
-
     id = factory.Sequence(lambda n: n + 1)
     place_id = 1
     alias = "Some alias"
@@ -40,11 +39,14 @@ class EventMtsFactory(factory.Factory):
     event_type = EventType.MUSICALS
     url = MTS_DOMAIN + "/some/url"
     imageUrl = MTS_DOMAIN + "/some-image/url"
-    venue = factory.LazyFunction(lambda: PlaceInEventFromMtsModel(
-        id=1,
-        title="Place title",
-        url=MTS_DOMAIN + "/place/url",
-    ))
+    venue = factory.LazyFunction(
+        lambda: PlaceInEventFromMtsModel(
+            id=1,
+            title="Place title",
+            url=MTS_DOMAIN + "/place/url",
+        )
+    )
+
 
 @pytest.fixture
 def create_event(session: AsyncSession):
