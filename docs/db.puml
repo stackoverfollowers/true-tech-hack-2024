@@ -53,12 +53,6 @@ entity "EventFeature" as ef {
     * feature_value: FeatureValue
 }
 
-entity "SimilarPlace" as sp {
-   * place_id: integer <<FK>>
-   * similar_id: integer <<FK>>
-}
-
-
 p ||--|{ pf
 f ||--|{ pf
 fv ||--|{ pf
@@ -66,6 +60,5 @@ fv ||--|{ ef
 p ||--|{ e
 e ||--|{ ef
 f ||--|{ ef
-p ||--|{ sp
-p ||--|{ sp
+
 @enduml
