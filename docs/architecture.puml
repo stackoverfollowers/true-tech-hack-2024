@@ -12,13 +12,11 @@ control Timer <<Cron>> as cron
 
 component "Place Parser" <<Aiomisc Service>> as p_parser
 
-component "Feature Parser" <<Aiomisc Service>> as f_parser
+component "Image Recognition" <<Aiomisc Yolo Service>> as f_parser
 
 cloud API <<MTS Live>> as mts
 
-cloud API <<Yandex Map>> as yandex
-
-queue "New Places" <<Queue>> as queue
+queue "New Places Queue" <<RabbitMQ>> as queue
 
 user -> front
 
@@ -39,7 +37,7 @@ f_parser --> db
 
 back --> queue
 
-f_parser --> yandex
-yandex --> f_parser
+f_parser --> mts
+
 
 @enduml
