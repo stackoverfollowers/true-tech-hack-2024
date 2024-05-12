@@ -45,7 +45,7 @@ class PlaceWithFeaturesModel(BaseModel):
     name: str
     url: str
     image_url: str
-    description: str
+    description: str | None
     address: str
     created_at: datetime
     updated_at: datetime
