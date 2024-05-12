@@ -22,7 +22,10 @@ Project of Team "Не грози Южному централу попивая с
 
 ### JS stack
 
-- ...
+- React
+- Axios / react-query
+- Material UI 
+- Typescipt
 
 ## Deployment
 
