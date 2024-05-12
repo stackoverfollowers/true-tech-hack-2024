@@ -17,6 +17,7 @@ from tth.common.places.models import (
     UpdatePlaceModel,
 )
 from tth.db.models import Feature as FeatureDb
+from tth.db.models import FeatureValue
 from tth.db.models import Place as PlaceDb
 from tth.db.models import PlaceFeature as PlaceFeatureDb
 from tth.db.utils import inject_session
@@ -194,3 +195,23 @@ class PlaceStorage:
         query = select(PlaceDb).where(PlaceDb.id.in_(place_ids))
         result = await session.scalars(query)
         return [PlaceModel.model_validate(row) for row in result.all()]
+
+    @inject_session
+    async def add_feature(
+        self,
+        session: AsyncSession,
+        place_id: int,
+        feature_id: int,
+        value: FeatureValue,
+    ) -> None:
+        stmt = (
+            insert(PlaceFeatureDb)
+            .values(
+                place_id=place_id,
+                feature_id=feature_id,
+                value=value,
+            )
+            .returning(PlaceFeatureDb)
+        )
+        await session.scalars(stmt)
+        await session.commit()

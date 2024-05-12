@@ -9,8 +9,11 @@ Create Date: 2024-05-12 10:48:58.868495
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+import sqlalchemy.orm as orm
 from alembic import op
 from sqlalchemy.dialects import postgresql
+
+from tth.db.models import Feature
 
 revision: str = "36e04eadb38a"
 down_revision: str | None = None
@@ -194,6 +197,21 @@ def upgrade() -> None:
         ["feature_id"],
         unique=False,
     )
+    bind = op.get_bind()
+    session = orm.Session(bind=bind)
+    session.add_all(
+        [
+            Feature(
+                name="Ramp",
+                slug="ramp",
+            ),
+            Feature(
+                name="Stairs",
+                slug="stairs",
+            ),
+        ]
+    )
+    session.commit()
 
 
 def downgrade() -> None:
