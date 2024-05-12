@@ -10,7 +10,14 @@ type EventsResponse = {
   id: number;
   place_id: number;
   name: string;
-  description: string;
+  event_type: string;
+  url: string;
+  image_url: string;
+  description: null;
+  started_at: null;
+  ended_at: null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type { Event, EventsResponse };
