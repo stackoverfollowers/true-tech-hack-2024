@@ -60,7 +60,7 @@ class EventWithFeaturesModel(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    features: Sequence[FeatureValue]
+    features: Sequence[EventFeatureModel]
 
 
 class EventPaginationModel(BaseModel):
