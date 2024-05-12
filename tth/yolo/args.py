@@ -3,15 +3,12 @@ import argclass
 from tth.common.args import (
     AMQPGroup,
     DatabaseGroup,
-    HostPortGroup,
     LogGroup,
-    ParserGroup,
-    ProjectGroup,
-    SecurityGroup,
+    YoloGroup,
 )
 
 
-class Parser(argclass.Parser):
+class YoloParser(argclass.Parser):
     debug: bool = argclass.Argument(
         "-D",
         "--debug",
@@ -23,9 +20,6 @@ class Parser(argclass.Parser):
     )
 
     log = LogGroup(title="Logging options")
-    http = HostPortGroup(title="HTTP options")
-    project = ProjectGroup(title="Project options")
     db = DatabaseGroup(title="Database options")
-    security = SecurityGroup(title="Security options")
+    yolo = YoloGroup(title="Yolo options")
     amqp = AMQPGroup(title="AMQP options")
-    parser = ParserGroup(title="Parser options")

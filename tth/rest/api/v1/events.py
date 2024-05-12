@@ -9,7 +9,7 @@ from tth.common.events.models import (
     EventWithFeaturesModel,
     UpdateEventModel,
 )
-from tth.common.events.storage import IEventStorage
+from tth.common.events.storage import EventStorage
 from tth.rest.overrides import GetEventStorage
 
 router = APIRouter(prefix="/events", tags=["Events"])
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/events", tags=["Events"])
 async def get_events(
     limit: int = Query(default=20, gt=0, le=100),
     offset: int = Query(default=0, gt=-1),
-    event_storage: IEventStorage = Depends(GetEventStorage),
+    event_storage: EventStorage = Depends(GetEventStorage),
 ) -> EventPaginationModel:
     return await event_storage.pagination(limit=limit, offset=offset)
 
@@ -27,7 +27,7 @@ async def get_events(
 @router.post("", response_model=EventModel)
 async def create_event(
     new_event: CreateEventModel,
-    event_storage: IEventStorage = Depends(GetEventStorage),
+    event_storage: EventStorage = Depends(GetEventStorage),
 ) -> EventModel:
     return await event_storage.create(
         new_event=new_event,
@@ -41,7 +41,7 @@ async def create_event(
 )
 async def get_event(
     event_id: int,
-    event_storage: IEventStorage = Depends(GetEventStorage),
+    event_storage: EventStorage = Depends(GetEventStorage),
 ) -> EventWithFeaturesModel:
     event = await event_storage.get_by_id_with_features(event_id=event_id)
     if event is None:
@@ -56,7 +56,7 @@ async def get_event(
 async def update_event(
     event_id: int,
     update_event: UpdateEventModel,
-    event_storage: IEventStorage = Depends(GetEventStorage),
+    event_storage: EventStorage = Depends(GetEventStorage),
 ) -> EventModel:
     return await event_storage.update(
         event_id=event_id,
@@ -68,7 +68,7 @@ async def update_event(
 async def delete_event(
     event_id: int,
     response: Response,
-    event_storage: IEventStorage = Depends(GetEventStorage),
+    event_storage: EventStorage = Depends(GetEventStorage),
 ) -> Response:
     await event_storage.delete(event_id=event_id)
     response.status_code = HTTPStatus.NO_CONTENT

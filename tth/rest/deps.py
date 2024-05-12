@@ -1,10 +1,14 @@
 from collections.abc import Sequence
 
+from aio_pika.patterns import Master
 from aiomisc_dependency import dependency
 from fastapi.middleware import Middleware
 
-from tth.args import Parser
+from tth.common.args import AMQPGroup, SecurityGroup
+from tth.common.events.storage import EventStorage
+from tth.common.places.storage import PlaceStorage
 from tth.common.users.storage import UserStorage
+from tth.cron.parser import MtsPlacesParser
 from tth.rest.auth.base import (
     AUTH_COOKIE,
     AUTH_HEADER,
@@ -17,11 +21,11 @@ from tth.rest.middlewares import get_cors_middleware
 from tth.rest.users.dispatcher import UserDispatcher
 
 
-def config_deps(parser: Parser) -> None:
+def config_deps(security: SecurityGroup, amqp: AMQPGroup) -> None:
     @dependency
     def jwt_processor() -> JwtProcessor:
         return JwtProcessor(
-            private_key=parser.security.private_key,
+            private_key=security.private_key,
         )
 
     @dependency
@@ -38,7 +42,7 @@ def config_deps(parser: Parser) -> None:
 
     @dependency
     def passgen() -> Passgen:
-        return Passgen(secret=parser.security.secret)
+        return Passgen(secret=security.secret)
 
     @dependency
     def user_dispatcher(
@@ -61,3 +65,16 @@ def config_deps(parser: Parser) -> None:
         cors_middleware: Middleware,
     ) -> Sequence[Middleware]:
         return (cors_middleware,)
+
+    @dependency
+    def mts_parser(
+        event_storage: EventStorage,
+        place_storage: PlaceStorage,
+        amqp_master: Master,
+    ) -> MtsPlacesParser:
+        return MtsPlacesParser(
+            event_storage=event_storage,
+            place_storage=place_storage,
+            amqp_master=amqp_master,
+            queue_name=amqp.queue_name,
+        )

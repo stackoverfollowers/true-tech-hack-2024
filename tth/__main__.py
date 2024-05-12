@@ -27,7 +27,7 @@ def main() -> None:
             description=parser.project.description,
             version=parser.project.version,
         ),
-        CronDataLoader(),
+        CronDataLoader(cron_spec=parser.parser.cron_spec),
     ]
 
     with entrypoint(

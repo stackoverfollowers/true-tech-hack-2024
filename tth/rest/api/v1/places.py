@@ -9,16 +9,17 @@ from tth.common.places.models import (
     PlaceWithFeaturesModel,
     UpdatePlaceModel,
 )
-from tth.common.places.storage import IPlaceStorage
+from tth.common.places.storage import PlaceStorage
 from tth.rest.overrides import GetPlaceStorage
 
 router = APIRouter(prefix="/places", tags=["Places"])
+
 
 @router.get("", response_model=PlacePaginationModel)
 async def get_places(
     limit: int = Query(default=20, gt=0, le=100),
     offset: int = Query(default=0, gt=-1),
-    place_storage: IPlaceStorage = Depends(GetPlaceStorage),
+    place_storage: PlaceStorage = Depends(GetPlaceStorage),
 ) -> PlacePaginationModel:
     return await place_storage.pagination(limit=limit, offset=offset)
 
@@ -26,7 +27,7 @@ async def get_places(
 @router.post("", response_model=PlaceModel)
 async def create_place(
     new_place: CreatePlaceModel,
-    place_storage: IPlaceStorage = Depends(GetPlaceStorage),
+    place_storage: PlaceStorage = Depends(GetPlaceStorage),
 ) -> PlaceModel:
     return await place_storage.create(
         new_place=new_place,
@@ -40,7 +41,7 @@ async def create_place(
 )
 async def get_place(
     place_id: int,
-    place_storage: IPlaceStorage = Depends(GetPlaceStorage),
+    place_storage: PlaceStorage = Depends(GetPlaceStorage),
 ) -> PlaceWithFeaturesModel:
     place = await place_storage.get_by_id_with_features(place_id=place_id)
     if place is None:
@@ -55,7 +56,7 @@ async def get_place(
 async def update_place(
     place_id: int,
     update_place: UpdatePlaceModel,
-    place_storage: IPlaceStorage = Depends(GetPlaceStorage),
+    place_storage: PlaceStorage = Depends(GetPlaceStorage),
 ) -> PlaceModel:
     return await place_storage.update(
         place_id=place_id,
@@ -67,7 +68,7 @@ async def update_place(
 async def delete_place(
     place_id: int,
     response: Response,
-    place_storage: IPlaceStorage = Depends(GetPlaceStorage),
+    place_storage: PlaceStorage = Depends(GetPlaceStorage),
 ) -> Response:
     await place_storage.delete(place_id=place_id)
     response.status_code = HTTPStatus.NO_CONTENT
