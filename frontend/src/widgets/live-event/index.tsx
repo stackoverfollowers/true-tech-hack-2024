@@ -1,11 +1,13 @@
 import { forwardRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Grow } from '@mui/material';
+import PushPinIcon from '@mui/icons-material/PushPin';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import styles from './styles.module.css';
 import { EventsResponse } from '@shared/types/events';
 
-export const LiveEvent = forwardRef<Ref, Props>(({ id, description, name }, ref) => {
+export const LiveEvent = forwardRef<Ref, Props>((props, ref) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -15,18 +17,39 @@ export const LiveEvent = forwardRef<Ref, Props>(({ id, description, name }, ref)
   return (
     <Grow
       in={mounted}
-      style={{ transformOrigin: '0 0 0' }}
-      {...(mounted ? { timeout: id * 150 } : {})}
     >
       <Link to="#">
         <div ref={ref} className={styles.card}>
+          <div className={styles.cover}>
+            <img src={props.image_url} className={styles.img} />
+
+            {/* <div className={styles.chips}>
+              <Chip label={discount} className={clsx(styles.chip, styles.gray)} />
+              <AccessibilityChip label={accessibility} ac={accessibilityType} />
+            </div> */}
+          </div>
           <div className={styles.inner}>
             <Box sx={{ color: 'text.secondary' }} className={styles.subtitle}>
-              {name}
+              {props.event_type}
             </Box>
             <Box sx={{ color: 'text.primary' }} className={styles.title}>
-              {description}
+              {props.name}
             </Box>
+            <Box sx={{ color: 'text.primary' }} className={styles.description}>
+              {props.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'}
+            </Box>
+            <div className={styles.footer}>
+              <div className={styles.time}>
+                <CalendarMonthIcon sx={{ width: 16, height: 16 }} />
+                <Box sx={{ color: 'text.secondary' }}>{new Intl.DateTimeFormat('ru-RU', {
+                  dateStyle: 'medium',
+                }).format(new Date(props.created_at))}</Box>
+              </div>
+              <div className={styles.place}>
+                <PushPinIcon sx={{ width: 16, height: 16, color: 'text.secondary' }} />
+                <Box sx={{ color: 'text.secondary' }}>{props.place_id}</Box>
+              </div>
+            </div>
           </div>
         </div>
       </Link>

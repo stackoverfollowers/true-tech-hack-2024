@@ -81,6 +81,10 @@
   font-weight: 500;
 }
 
+.description {
+  font-size: 15px;
+}
+
 .footer {
   display: flex;
   align-items: center;
@@ -93,4 +97,14 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.place {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
