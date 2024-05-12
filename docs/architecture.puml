@@ -1,0 +1,45 @@
+@startuml architecture
+
+actor User as user
+
+database Database <<PostgreSQL>> as db
+
+component Backend <<FastAPI Service>> as back
+
+component Frontend <<Nginx + React>> as front
+
+control Timer <<Cron>> as cron
+
+component "Place Parser" <<Aiomisc Service>> as p_parser
+
+component "Feature Parser" <<Aiomisc Service>> as f_parser
+
+cloud API <<MTS Live>> as mts
+
+cloud API <<Yandex Map>> as yandex
+
+queue "New Places" <<Queue>> as queue
+
+user -> front
+
+front --> back
+
+back --> db
+
+cron --> p_parser
+
+p_parser --> mts
+mts --> p_parser
+
+p_parser --> db
+p_parser --> queue
+
+f_parser <-- queue
+f_parser --> db
+
+back --> queue
+
+f_parser --> yandex
+yandex --> f_parser
+
+@enduml

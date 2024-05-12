@@ -25,7 +25,9 @@ test: ##@Test Run tests with pytest
 	pytest -vvx $(TEST_PATH)
 
 test-ci: ##@Test Run tests with pytest and coverage in CI
-	.venv/bin/pytest $(TEST_PATH) --junitxml=./junit.xml --cov=./$(PROJECT_NAME) --cov-report=xml
+	.venv/bin/coverage run -m pytest $(TEST_PATH) --junitxml=junit_report.xml
+	.venv/bin/coverage report
+	.venv/bin/coverage xml
 
 develop: clean_dev ##@Develop Create virtualenv
 	python$(PYTHON_VERSION) -m venv .venv
@@ -46,7 +48,7 @@ alembic-downgrade:  ##@Database Run alembic downgrade to previous version
 	.venv/bin/python -m $(PROJECT_NAME).db --pg-dsn=$(APP_DB_PG_DSN) downgrade -1
 
 alembic-revision:  ##@Database New alembic revision
-	.venv/bin/python -m $(PROJECT_NAME).db --pg-dsn=$(APP_DB_PG_DSN) revision --autogenerate
+	.venv/bin/python -m $(PROJECT_NAME).db --pg-dsn=$(APP_DB_PG_DSN) revision --autogenerate -m "Initial revision"
 
 docker-alembic-upgrade-head: ##@Database Run alembic upgrade head in docker
 	docker-compose exec backend python -m $(PROJECT_NAME).db upgrade head

@@ -1,13 +1,13 @@
 import argclass
 
 from tth.common.args import (
+    AMQPGroup,
     DatabaseGroup,
     HostPortGroup,
     LogGroup,
+    ParserGroup,
     ProjectGroup,
-    RedisGroup,
     SecurityGroup,
-    TelegramGroup,
 )
 
 
@@ -16,12 +16,6 @@ class Parser(argclass.Parser):
         "-D",
         "--debug",
         default=False,
-        type=lambda x: x.lower() == "true",
-    )
-    with_cache: bool = argclass.Argument(
-        "-C",
-        "--with-cache",
-        default=True,
         type=lambda x: x.lower() == "true",
     )
     pool_size: int = argclass.Argument(
@@ -33,5 +27,5 @@ class Parser(argclass.Parser):
     project = ProjectGroup(title="Project options")
     db = DatabaseGroup(title="Database options")
     security = SecurityGroup(title="Security options")
-    telegram = TelegramGroup(title="Telegram options")
-    redis = RedisGroup(title="Redis options")
+    amqp = AMQPGroup(title="AMQP options")
+    parser = ParserGroup(title="Parser options")

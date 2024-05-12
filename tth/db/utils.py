@@ -40,7 +40,7 @@ TFunc = Callable[
 
 
 def inject_session(func: TFunc) -> TFunc:
-    @wraps(func)
+    @wraps(func) # type: ignore[arg-type]
     async def wrapper(
         self: TClass, *args: TParams.args, **kwargs: TParams.kwargs
     ) -> TReturn:

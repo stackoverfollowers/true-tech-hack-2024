@@ -1,14 +1,18 @@
-import abc
 import asyncio
-from collections.abc import Sequence
+import logging
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from itertools import islice
+from typing import Any
 
-from sqlalchemy import delete, func, insert, select, union, update
+from sqlalchemy import delete, func, select, union, update
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from tth.common.events.models import (
+    CreateEventModel,
     EventFeatureModel,
+    EventFromMtsModel,
     EventModel,
     EventPaginationModel,
     EventWithFeaturesModel,
@@ -20,48 +24,13 @@ from tth.db.models import Feature as FeatureDb
 from tth.db.models import PlaceFeature as PlaceFeatureDb
 from tth.db.utils import inject_session
 
+log = logging.getLogger(__name__)
 
-class IEventStorage(abc.ABC):
-    @abc.abstractmethod
-    async def get_by_id(self, event_id: int) -> EventModel | None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def get_by_id_with_features(
-        self, event_id: int
-    ) -> EventWithFeaturesModel | None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def create(
-        self,
-        place_id: int,
-        name: str,
-        description: str,
-        started_at: datetime,
-        ended_at: datetime,
-    ) -> EventModel:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def update(
-        self,
-        event_id: int,
-        update_event: UpdateEventModel,
-    ) -> EventModel:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def delete(self, event_id: int) -> None:
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    async def pagination(self, limit: int, offset: int) -> EventPaginationModel:
-        raise NotImplementedError
+INSERT_CHUNK_SIZE = 500
 
 
 @dataclass(frozen=True)
-class EventStorage(IEventStorage):
+class EventStorage:
     session_factory: async_sessionmaker[AsyncSession]
 
     @inject_session
@@ -105,6 +74,9 @@ class EventStorage(IEventStorage):
             id=event.id,
             place_id=event.place_id,
             name=event.name,
+            url=event.url,
+            image_url=event.image_url,
+            event_type=event.event_type,
             description=event.description,
             started_at=event.started_at,
             ended_at=event.ended_at,
@@ -119,24 +91,23 @@ class EventStorage(IEventStorage):
     async def create(
         self,
         session: AsyncSession,
-        place_id: int,
-        name: str,
-        description: str,
-        started_at: datetime,
-        ended_at: datetime,
+        new_event: CreateEventModel,
     ) -> EventModel:
         stmt = (
             insert(EventDb)
             .values(
-                place_id=place_id,
-                name=name,
-                description=description,
-                started_at=started_at,
-                ended_at=ended_at,
+                place_id=new_event.place_id,
+                name=new_event.name,
+                url=new_event.url,
+                image_url=new_event.image_url,
+                event_type=new_event.event_type,
+                description=new_event.description,
+                started_at=new_event.started_at,
+                ended_at=new_event.ended_at,
             )
             .returning(EventDb)
         )
-        result = await session.execute(stmt)
+        result = await session.scalars(stmt)
         await session.commit()
         return EventModel.model_validate(result.one())
 
@@ -154,13 +125,14 @@ class EventStorage(IEventStorage):
             .values(**data)
             .returning(EventDb)
         )
-        result = await session.execute(stmt)
+        result = await session.scalars(stmt)
         await session.commit()
         return EventModel.model_validate(result.one())
 
     @inject_session
     async def delete(self, session: AsyncSession, event_id: int) -> None:
         await session.execute(delete(EventDb).where(EventDb.id == event_id))
+        await session.commit()
 
     async def pagination(
         self,
@@ -200,3 +172,50 @@ class EventStorage(IEventStorage):
         stmt = select(EventDb).order_by(EventDb.id).offset(offset).limit(limit)
         result = await session.scalars(stmt)
         return result.all()
+
+    @inject_session
+    async def save_many_from_mts(
+        self,
+        session: AsyncSession,
+        events: Iterable[EventFromMtsModel],
+    ) -> Sequence[int]:
+        event_ids: list[int] = []
+        for events_chunk in split_every(INSERT_CHUNK_SIZE, events):
+            stmt: Any = insert(EventDb).values(
+                [
+                    {
+                        "id": event_data.id,
+                        "name": event_data.title,
+                        "place_id": event_data.venue.id,
+                        "url": event_data.url,
+                        "image_url": event_data.image_url,
+                        "event_type": event_data.event_type,
+                    }
+                    for event_data in events_chunk
+                ]
+            )
+
+            stmt = stmt.on_conflict_do_update(
+                index_elements=[EventDb.id],
+                set_={
+                    "name": stmt.excluded.name,
+                    "place_id": stmt.excluded.place_id,
+                    "url": stmt.excluded.url,
+                    "image_url": stmt.excluded.image_url,
+                    "event_type": stmt.excluded.event_type,
+                },
+            ).returning(EventDb.id)
+
+            result = await session.scalars(stmt)
+            event_ids.extend(result.all())
+
+        await session.commit()
+        return event_ids
+
+
+def split_every(n: int, iterable: Iterable) -> Iterable:
+    i = iter(iterable)
+    piece = list(islice(i, n))
+    while piece:
+        yield piece
+        piece = list(islice(i, n))

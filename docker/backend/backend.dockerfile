@@ -20,7 +20,7 @@ RUN pip install -U --no-cache-dir poetry pip && poetry config virtualenvs.create
 
 RUN --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     --mount=type=bind,source=poetry.lock,target=poetry.lock \
-    poetry install --no-interaction --no-ansi --no-root --without dev
+    poetry install --no-interaction --no-ansi --no-root --without dev --without yolo
 
 USER appuser
 

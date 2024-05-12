@@ -4,6 +4,7 @@ from aiomisc import Service, entrypoint
 from aiomisc_log import basic_config
 
 from tth.args import Parser
+from tth.cron.service import CronDataLoader
 from tth.deps import config_all_deps
 from tth.rest.service import REST
 
@@ -26,7 +27,7 @@ def main() -> None:
             description=parser.project.description,
             version=parser.project.version,
         ),
-        # TelegramBotService(),
+        CronDataLoader(cron_spec=parser.parser.cron_spec),
     ]
 
     with entrypoint(
