@@ -14,6 +14,21 @@ const getEvents = async ({ signal }: { signal: AbortSignal }) => {
   return data;
 };
 
+const getEventById = async (id: number, { signal }: { signal: AbortSignal }) => {
+  const { data } = await axios(`${endpointKey}/${id}`, {
+    signal,
+  });
+
+  return data;
+};
+
+export const useGetEventById = (id: number) => {
+  return useQuery<EventsResponse>({
+    queryKey,
+    queryFn: ({ signal} ) => getEventById(id, {signal}),
+  });
+};
+
 type UseGetEvents = Pagination<EventsResponse[]>;
 
 export const useGetEvents = () => {
@@ -22,3 +37,4 @@ export const useGetEvents = () => {
     queryFn: getEvents,
   });
 };
+

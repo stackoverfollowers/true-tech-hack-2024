@@ -7,6 +7,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import styles from './styles.module.css';
 import { EventsResponse } from '@shared/types/events';
 import { Place } from '@widgets/place';
+import { AccessibilityChip } from '@widgets/accessibility-chip';
 
 export const LiveEvent = forwardRef<Ref, Props>((props, ref) => {
   const [mounted, setMounted] = useState(false);
@@ -26,10 +27,11 @@ export const LiveEvent = forwardRef<Ref, Props>((props, ref) => {
             <div className={styles.cover}>
               <img src={props.image_url} className={styles.img} />
 
-              {/* <div className={styles.chips}>
-                <Chip label={discount} className={clsx(styles.chip, styles.gray)} />
-                <AccessibilityChip label={accessibility} ac={accessibilityType} />
-              </div> */}
+              {props.features && props.features.length > 0 && <div className={styles.chips}>
+                {props.features.map((feature, idx) => (
+                  <AccessibilityChip key={idx} label={feature.name} ac={feature.value === 'AVAILABLE' ? 'Good' : 'Neutral'}/>
+                ))}
+              </div>}
             </div>
             <div className={styles.inner}>
               <Box sx={{ color: 'text.secondary' }} className={styles.subtitle}>

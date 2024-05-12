@@ -18,6 +18,11 @@ type EventsResponse = {
   ended_at: null;
   created_at: string;
   updated_at: string;
+  features: {
+    name: string,
+    slug: string,
+    value: string
+  }[]
 };
 
 export type { Event, EventsResponse };
