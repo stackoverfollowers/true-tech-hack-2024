@@ -19,12 +19,10 @@ export const LiveEvent = forwardRef<Ref, Props>((props, ref) => {
   return (
     <>
       <Grow in={mounted}>
-        <Link to="#">
+        <Link to={`/events/${props.id}`}>
           <div ref={ref} className={styles.card}>
             <div className={styles.cover}>
-              <Link to={`/events/${props.id}`}>
-                <img src={props.image_url} className={styles.img} />
-              </Link>
+              <img src={props.image_url} className={styles.img} />
             </div>
             <div className={styles.inner}>
               <Box sx={{ color: 'text.secondary' }} className={styles.subtitle}>
@@ -46,7 +44,10 @@ export const LiveEvent = forwardRef<Ref, Props>((props, ref) => {
                     }).format(new Date(props.created_at))}
                   </Box>
                 </div>
-                <div className={styles.place} onClick={() => setIsOpen(true)}>
+                <div className={styles.place} onClick={(e) => {
+                  e.preventDefault();
+                  setIsOpen(true)
+                }}>
                   <PushPinIcon sx={{ width: 16, height: 16, color: 'text.secondary' }} />
                   <Box sx={{ color: 'text.secondary' }}>{props.place_id}</Box>
                 </div>

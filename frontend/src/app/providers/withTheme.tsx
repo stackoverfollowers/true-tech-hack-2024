@@ -1,8 +1,9 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { createContext, useMemo, useState } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material';
 
-export const ThemeContext = createContext({ toggle: () => {} });
+export const ThemeContext = createContext({ toggle: () => { } });
 
 export const WithTheme = ({ children }: Props) => {
   const [mode, setMode] = useState<'light' | 'dark'>('light');

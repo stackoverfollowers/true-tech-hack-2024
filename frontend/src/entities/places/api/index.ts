@@ -25,7 +25,8 @@ const getPlaceById = async (id: number, { signal }: { signal: AbortSignal }) => 
 export const useGetPlaceById = (id: number) => {
   return useQuery<Place>({
     queryKey,
-    queryFn: ({signal}) => getPlaceById(id, {signal}),
+    queryFn: ({ signal }) => getPlaceById(id, { signal }),
+    enabled: !!id,
   });
 };
 
