@@ -9,4 +9,12 @@ type Place = {
   updated_at: string;
 };
 
-export type { Place };
+type CreatePlaceDTO = {
+  name: string;
+  url: string;
+  image_url: string;
+  description: string;
+  address: string;
+};
+
+export type { Place, CreatePlaceDTO };

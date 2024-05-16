@@ -1,6 +1,10 @@
 import { useGetEvents } from '@entities/event/api';
-import { Container, Typography, styled } from '@mui/material';
+import { Container, Fab, Typography, styled } from '@mui/material';
 import { LiveEvent } from '@widgets/live-event';
+
+import AddIcon from '@mui/icons-material/Add';
+import { useState } from 'react';
+import { CreatePlaceModal } from '@widgets/create-place-modal';
 
 const Title = styled(Typography)({
   fontSize: '2rem',
@@ -8,6 +12,7 @@ const Title = styled(Typography)({
 });
 
 const StyledContainer = styled(Container)({
+  position: 'relative',
   padding: 10,
 });
 
@@ -37,10 +42,16 @@ const Wrapper = styled('div')(({ theme }) => ({
   },
 }));
 
+const StyledFab = styled(Fab)({
+  position: 'absolute',
+  bottom: 2,
+  right: 2,
+});
+
 export const RootPage = () => {
   const { data } = useGetEvents();
 
-  console.log('data', data)
+  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -55,6 +66,10 @@ export const RootPage = () => {
             </Wrapper>
           ))}
         </Cards>
+        <StyledFab color="primary" onClick={() => setOpen(true)}>
+          <AddIcon />
+        </StyledFab>
+        <CreatePlaceModal open={open} onClose={() => setOpen(false)} />
       </StyledContainer>
     </>
   );

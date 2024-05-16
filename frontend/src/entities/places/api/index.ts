@@ -1,7 +1,7 @@
 import { axios } from '@shared/api';
 import { Pagination } from '@shared/types/pagination';
-import { Place } from '@shared/types/places';
-import { useQuery } from '@tanstack/react-query';
+import { CreatePlaceDTO, Place } from '@shared/types/places';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 const queryKey = ['places'];
 const endpointKey = '/places';
@@ -22,10 +22,16 @@ const getPlaceById = async (id: number, { signal }: { signal: AbortSignal }) => 
   return data;
 };
 
+const createPlace = async (place: CreatePlaceDTO) => {
+  const { data } = await axios.post<Place>('places', place);
+
+  return data;
+};
+
 export const useGetPlaceById = (id: number) => {
   return useQuery<Place>({
-    queryKey,
-    queryFn: ({signal}) => getPlaceById(id, {signal}),
+    queryKey: [...queryKey, id],
+    queryFn: ({ signal }) => getPlaceById(id, { signal }),
   });
 };
 
@@ -35,5 +41,11 @@ export const useGetPlaces = () => {
   return useQuery<UseGetPlaces>({
     queryKey,
     queryFn: getPlaces,
+  });
+};
+
+export const useCreatePlace = () => {
+  return useMutation<Place, unknown, CreatePlaceDTO>({
+    mutationFn: (place: CreatePlaceDTO) => createPlace(place),
   });
 };

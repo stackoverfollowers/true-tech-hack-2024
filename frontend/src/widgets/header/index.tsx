@@ -1,6 +1,6 @@
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import MenuItem from '@mui/material/MenuItem';
+import { Box } from '@mui/material';
+import { Typography } from '@mui/material';
+import { MenuItem } from '@mui/material';
 import { clsx } from 'clsx';
 import { Link } from 'react-router-dom';
 
