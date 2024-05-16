@@ -7,6 +7,7 @@ type Place = {
   address: string;
   created_at: string;
   updated_at: string;
+  features: { name: string; slug: string; value: string }[];
 };
 
 type CreatePlaceDTO = {

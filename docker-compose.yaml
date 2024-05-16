@@ -52,7 +52,7 @@ services:
 
       APP_AMQP_DSN: amqp://$RABBITMQ_USER:$RABBITMQ_PASSWORD@rabbitmq:5672/
 
-      APP_PARSER_CRON_SPEC: '*/30 * * * *'
+      APP_PARSER_CRON_SPEC: '*/33 * * * *'
 
     depends_on:
       rabbitmq:

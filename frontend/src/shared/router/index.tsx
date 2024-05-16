@@ -5,6 +5,7 @@ import { ProfilePage } from '../../pages/profile';
 import { RootPage } from '../../pages/root';
 import { Layout } from '@widgets/layout';
 import { EventPage } from '@pages/event';
+import { PlacePage } from '@pages/place';
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
       {
         path: '/events/:id',
         element: <EventPage />,
+      },
+      {
+        path: '/places/:id',
+        element: <PlacePage />,
       },
     ],
   },

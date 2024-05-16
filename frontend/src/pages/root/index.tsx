@@ -12,8 +12,13 @@ const Title = styled(Typography)({
 });
 
 const StyledContainer = styled(Container)({
-  position: 'relative',
   padding: 10,
+});
+
+const StyledContainer2 = styled(Container)({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
 });
 
 const Cards = styled('div')(() => ({
@@ -42,11 +47,7 @@ const Wrapper = styled('div')(({ theme }) => ({
   },
 }));
 
-const StyledFab = styled(Fab)({
-  position: 'absolute',
-  bottom: 2,
-  right: 2,
-});
+const StyledFab = styled(Fab)({});
 // const data = {
 //   "meta": {
 //     "total": 11241,
@@ -324,9 +325,13 @@ export const RootPage = () => {
 
   return (
     <>
-      <StyledContainer>
+      <StyledContainer2>
         <Title variant="h2">Афиша Санкт-Петербурга</Title>
-      </StyledContainer>
+        <StyledFab color="primary" onClick={() => setOpen(true)}>
+          <AddIcon />
+        </StyledFab>
+      </StyledContainer2>
+
       <StyledContainer>
         <Cards>
           {data?.items.map((item, idx) => (
@@ -335,9 +340,7 @@ export const RootPage = () => {
             </Wrapper>
           ))}
         </Cards>
-        <StyledFab color="primary" onClick={() => setOpen(true)}>
-          <AddIcon />
-        </StyledFab>
+
         <CreatePlaceModal open={open} onClose={() => setOpen(false)} />
       </StyledContainer>
     </>
