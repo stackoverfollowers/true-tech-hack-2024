@@ -24,7 +24,7 @@ export const EventPage = () => {
 
   const { data } = useGetEventById(Number(id));
 
-  const { data: place } = useGetPlaceById(data?.place_id);
+  const { data: place } = useGetPlaceById(data?.place_id || 0);
 
   if (!data) return null;
 
