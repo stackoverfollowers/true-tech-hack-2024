@@ -32,6 +32,7 @@ export const useGetPlaceById = (id: number) => {
   return useQuery<Place>({
     queryKey: [...queryKey, id],
     queryFn: ({ signal }) => getPlaceById(id, { signal }),
+    enabled: !!id,
   });
 };
 
